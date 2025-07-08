@@ -27,23 +27,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     $stmt = $conn->prepare("SELECT id, email, password FROM users WHERE email = ?");
-    
+
     if ($stmt === false) {
         die("Error preparing statement: " . $conn->error);
     }
 
     $stmt->bind_param("s", $email);
-
     $stmt->execute();
-
     $stmt->store_result(); 
 
     if ($stmt->num_rows > 0) {
         $stmt->bind_result($user_id, $db_email, $hashed_password_from_db);
-        $stmt->fetch(); // Fetch the row (there should only be one since email is UNIQUE)
+        $stmt->fetch();
 
         // --- Verify Password ---
-        // Use password_verify() to compare the plain text input password with the stored hashed password
         if (password_verify($input_password, $hashed_password_from_db)) {
             // Password is correct! User is authenticated.
 
@@ -52,33 +49,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['user_email'] = $db_email;
             $_SESSION['logged_in'] = true;
 
+            // Store email and login time in cookies (valid for 7 days)
+            setcookie("user_email", $db_email, time() + (86400 * 7), "/");
+            setcookie("login_time", date("Y-m-d H:i:s"), time() + (86400 * 7), "/");
+
+            // Optional: update last_login in database
+            $updateStmt = $conn->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
+            $updateStmt->bind_param("i", $user_id);
+            $updateStmt->execute();
+            $updateStmt->close();
+
             // Clear any previous login error
             unset($_SESSION['login_error']);
 
-            // Redirect the user to a secure dashboard or welcome page
-            // You'll need to create a 'dashboard.php' file or a similar page
+            // Redirect to dashboard
             header("Location: dashboard.php");
-            exit; // Always exit after a header redirect
+            exit;
         } else {
-            // Incorrect password
             $_SESSION['login_error'] = "Invalid email or password.";
             header("Location: index.html");
             exit;
         }
     } else {
-        // No user found with that email address
         $_SESSION['login_error'] = "Invalid email or password.";
         header("Location: index.html");
         exit;
     }
 
-    // --- Close Statement and Connection ---
     $stmt->close();
     $conn->close();
 
 } else {
-    // If someone tries to access login.php directly without a POST request (e.g., typing the URL)
-    header("Location: index.html"); // Redirect them back to the login page
+    header("Location: index.html");
     exit;
 }
 ?>

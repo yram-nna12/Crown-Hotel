@@ -1,6 +1,7 @@
 <?php
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+session_start();
 
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $host = "localhost";
     $username = "root";
     $password = "";
@@ -20,11 +21,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $confirm_password = $_POST['confirm_password'] ?? '';
 
     if (!$first_name || !$last_name || !$email || !$phone || !$password || !$confirm_password) {
-        die("All fields are required.");
+        $_SESSION['register_error'] = "All fields are required.";
+        header("Location: index.html");
+        exit;
+    }
+
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $_SESSION['register_error'] = "Invalid email format.";
+        header("Location: index.html");
+        exit;
     }
 
     if ($password !== $confirm_password) {
-        die("Passwords do not match.");
+        $_SESSION['register_error'] = "Passwords do not match.";
+        header("Location: index.html");
+        exit;
     }
 
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
@@ -33,16 +44,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->bind_param("sssss", $first_name, $last_name, $email, $phone, $hashed_password);
 
     if ($stmt->execute()) {
-        echo "<h2>Account created successfully!</h2>";
-        echo "<a href='index.html'>Return to Login</a>";
+        $_SESSION['register_success'] = "Account created successfully! Please log in.";
+        header("Location: login.html");
     } else {
-        echo "Error: " . $stmt->error;
+        $_SESSION['register_error'] = "Error: " . $stmt->error;
+        header("Location: index.html");
     }
 
     $stmt->close();
     $conn->close();
 } else {
-
     header("Location: index.html");
     exit;
 }
