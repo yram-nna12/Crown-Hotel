@@ -71,12 +71,11 @@ $user = $result->fetch_assoc();
   </header>
 
   <div class="account-container">
-    <img src="../assets/img/LOGO.png" alt="Logo" class="logo">
     <h1>
       Hi <?= htmlspecialchars($user['first_name']) ?>!
       <span class="icon-buttons">
-        <button id="edit-btn" onclick="enableEdit()">✏️ Edit</button>
-        <button id="save-btn" form="profile-form" name="save_profile" style="display:none;">💾 Save</button>
+        <button id="edit-btn" onclick="enableEdit()">Edit</button>
+        <button id="save-btn" form="profile-form" name="save_profile" style="display:none;">Save</button>
       </span>
     </h1>
 
