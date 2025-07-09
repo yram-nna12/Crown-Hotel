@@ -1,3 +1,19 @@
+<?php
+session_start();
+
+// Retrieve session data
+$email = $_SESSION['email'] ?? 'Not set';
+$first_name = $_SESSION['first_name'] ?? '';
+$last_name = $_SESSION['last_name'] ?? '';
+$contact = $_SESSION['contact'] ?? '';
+$check_in = $_SESSION['check_in'] ?? '';
+$check_out = $_SESSION['check_out'] ?? '';
+$room_type = $_SESSION['room_type'] ?? 'Standard Room';
+
+$full_name = trim($first_name . ' ' . $last_name);
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43,23 +59,29 @@
       </div>
     </div>
 
-    <div class="right-panel">
-      <div class="booking-box">
-        <h3>Crown Hotel at Legaspi</h3>
-        <p class="location">Pasay City, Metro Manila</p>
-        <div class="info-box">Guests: Example number</div>
-        <div class="info-box">Check-in: Example date</div>
-        <div class="info-box">Check-out: Example date</div>
-        <div class="info-box">Room Type: Standard Room</div>
-<div class="total-section">
-  <p class="total-label">Total Payment<br><span>Included Tax</span></p>
-  <p class="price">₱1,200</p>
-</div>
-<button class="pay-button" id="open-popup">Pay Now</button>
+<div class="right-panel">
+  <div class="booking-box">
+    <h3>Crown Hotel at Legaspi</h3>
+    <p class="location">Pasay City, Metro Manila</p>
+    
+<div class="info-box">Transaction ID: <?= htmlspecialchars($_SESSION['transaction_id'] ?? 'Unavailable') ?></div>
+<div class="info-box">Name: <?= htmlspecialchars($full_name) ?></div>
+<div class="info-box">Email: <?= htmlspecialchars($email) ?></div>
+<div class="info-box">Contact: <?= htmlspecialchars($contact) ?></div>
+<div class="info-box">Check-in: <?= htmlspecialchars($check_in) ?></div>
+<div class="info-box">Check-out: <?= htmlspecialchars($check_out) ?></div>
+<div class="info-box">Room Type: <?= htmlspecialchars($room_type) ?></div>
 
-      </div>
+
+    <div class="total-section">
+      <p class="total-label">Total Payment<br><span>Included Tax</span></p>
+      <p class="price">₱1,200</p> <!-- Optional: Make this dynamic -->
     </div>
+    
+    <button class="pay-button" id="open-popup">Pay Now</button>
   </div>
+</div>
+
 
   <footer class="footer">
     <div class="footer-content">
