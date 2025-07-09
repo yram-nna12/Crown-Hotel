@@ -1,9 +1,13 @@
+<?php
+// booknow.php
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Payment Page</title>
+  <title>Book Now</title>
   <link rel="stylesheet" href="./assets/css/style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -28,39 +32,44 @@
         Cancellations are subject to a penalty: 20% of the room rate if cancelled within 2 days of check-in, 15% if cancelled 4 days prior, and 10% if cancelled 5 days or more in advance (based on 24-hour format).
       </p>
 
-      <form>
+      <!-- ✅ Form submission goes to process_booking.php -->
+      <form method="POST" action="./process_booking.php">
         <label>Email</label>
-        <input type="email" placeholder="Enter your email" required>
+        <input type="email" name="email" placeholder="Enter your email" required>
 
         <div class="name-fields">
           <div class="form-group">
             <label>First Name</label>
-            <input type="text" placeholder="First Name" required>
+            <input type="text" name="first_name" placeholder="First Name" required>
           </div>
           <div class="form-group">
             <label>Last Name</label>
-            <input type="text" placeholder="Last Name" required>
+            <input type="text" name="last_name" placeholder="Last Name" required>
           </div>
         </div>
 
         <label>Contact Number</label>
-        <input type="tel" placeholder="Mobile or phone number" required>
+        <input type="tel" name="contact" placeholder="Mobile or phone number" required>
 
         <div class="row-fields">
           <div class="form-group">
             <label>Check In</label>
-            <input type="date">
+            <input type="date" name="check_in" required>
           </div>
           <div class="form-group">
             <label>Check Out</label>
-            <input type="date">
+            <input type="date" name="check_out" required>
           </div>
         </div>
+
+        <input type="hidden" name="room_type" value="Standard Room">
+
+        <button type="submit" class="btn submit">Proceed</button>
       </form>
     </div>
 
     <div class="right-panel">
-      <!-- Optional: Add your booking summary or payment info here -->
+      <!-- Optional: Booking summary or image -->
     </div>
   </main>
 
