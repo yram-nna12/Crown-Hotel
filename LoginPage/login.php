@@ -1,35 +1,55 @@
 <?php
 session_start();
+include '../config.php'; // Uses your existing config.php for DB connection
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $host = "localhost";
-    $username = "root";
-    $password = "";
-    $database = "crown_db";
-
-    $conn = new mysqli($host, $username, $password, $database);
-
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-
     $email = trim($_POST['email'] ?? '');
-    $input_password = $_POST['password'] ?? ''; 
+    $input_password = $_POST['password'] ?? '';
 
     if (empty($email) || empty($input_password)) {
         $_SESSION['login_error'] = "Please enter both email and password.";
-        header("Location: index.php"); 
+        header("Location: index.php");
         exit;
     }
 
-    $stmt = $conn->prepare("SELECT id, email, password FROM users WHERE email = ?");
-    if ($stmt === false) {
-        die("Error preparing statement: " . $conn->error);
+    // 1. Check in admin_accounts
+    $stmt = $conn->prepare("SELECT id, email, password FROM admin_accounts WHERE email = ?");
+    if (!$stmt) {
+        die("Admin stmt failed: " . $conn->error);
     }
-
     $stmt->bind_param("s", $email);
     $stmt->execute();
-    $stmt->store_result(); 
+    $stmt->store_result();
+
+    if ($stmt->num_rows > 0) {
+        // Found in admin_accounts
+        $stmt->bind_result($admin_id, $admin_email, $admin_hashed_password);
+        $stmt->fetch();
+
+        if (password_verify($input_password, $admin_hashed_password)) {
+            $_SESSION['admin_id'] = $admin_id;
+            $_SESSION['admin_email'] = $admin_email;
+            $_SESSION['is_admin'] = true;
+
+            header("Location: admin_dashboard.php");
+            exit;
+        } else {
+            $_SESSION['login_error'] = "Invalid email or password.";
+            header("Location: index.php");
+            exit;
+        }
+    }
+
+    $stmt->close(); // Continue to check users
+
+    // 2. Check in users table
+    $stmt = $conn->prepare("SELECT id, email, password FROM users WHERE email = ?");
+    if (!$stmt) {
+        die("User stmt failed: " . $conn->error);
+    }
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $stmt->store_result();
 
     if ($stmt->num_rows === 0) {
         $_SESSION['login_error'] = "Account not found. Please sign up first.";
@@ -37,15 +57,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit;
     }
 
-    $stmt->bind_result($user_id, $db_email, $hashed_password_from_db);
+    $stmt->bind_result($user_id, $user_email, $user_hashed_password);
     $stmt->fetch();
 
-    if (password_verify($input_password, $hashed_password_from_db)) {
+    if (password_verify($input_password, $user_hashed_password)) {
         $_SESSION['user_id'] = $user_id;
-        $_SESSION['user_email'] = $db_email;
+        $_SESSION['user_email'] = $user_email;
         $_SESSION['logged_in'] = true;
 
-        setcookie("user_email", $db_email, time() + (86400 * 7), "/");
+        setcookie("user_email", $user_email, time() + (86400 * 7), "/");
         setcookie("login_time", date("Y-m-d H:i:s"), time() + (86400 * 7), "/");
 
         $updateStmt = $conn->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
@@ -54,10 +74,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $updateStmt->close();
 
         unset($_SESSION['login_error']);
-
         header("Location: dashboard.php");
         exit;
-
     } else {
         $_SESSION['login_error'] = "Invalid email or password.";
         header("Location: index.php");
@@ -70,5 +88,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     header("Location: index.php");
     exit;
 }
-
-
