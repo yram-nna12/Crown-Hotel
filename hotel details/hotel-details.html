@@ -34,7 +34,7 @@
   <div class="room-section"></div>
 
   <footer class="footer">
-    <!-- Footer content same as your current code -->
+    <!-- Footer content -->
   </footer>
 
   <script>
@@ -125,6 +125,9 @@
       hotel.images.forEach(src => {
         const img = document.createElement("img");
         img.src = src;
+        img.style.objectFit = "cover";
+        img.style.width = "100%";
+        img.style.height = "300px";
         carousel.appendChild(img);
       });
 
@@ -152,7 +155,7 @@
             <p>Start at</p>
             <h2>₱${room.price}</h2>
             <small>Included Tax</small>
-            <a href="../hotel list/booking.html?hotel=${id}&room=${encodeURIComponent(room.name)}" class="btn book-now">Book Now</a>
+            <a href="../payment/payment.html?hotel=Crown%20Hotel%20at%20Legaspi&room=Standard%20Room&guests=2&checkin=2025-07-12&checkout=2025-07-14&price=1200" class="btn book-now">Book Now</a>
           </div>`;
         roomSection.appendChild(div);
       });
