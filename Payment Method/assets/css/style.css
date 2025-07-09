@@ -1,0 +1,455 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #f4f4f4;
+  line-height: 1.5;
+}
+
+/* NAVIGATION BAR */
+.topbar {
+  background-color: #112752;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 3rem;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.logo img {
+  height: 90px;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding-right: 1rem;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #fff;
+  font-weight: 500;
+}
+
+.btn {
+  padding: 0.7rem 1.8rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.login {
+  background: #fff;
+  color: #0a2240;
+}
+
+.signup {
+  background: #d9a441;
+  color: #fff;
+}
+
+/* MAIN PAYMENT SECTION */
+.payment {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding: 40px 60px;
+  gap: 40px;
+}
+
+.left-panel {
+  width: 60%;
+  padding-right: 20px;
+}
+
+.right-panel {
+  width: 35%;
+}
+
+.booking-title {
+  color: #b58a1a;
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.note {
+  font-size: 0.9rem;
+  color: #333;
+  margin-bottom: 25px;
+}
+
+h3 {
+  margin: 25px 0 15px;
+  color: #112752;
+}
+
+form input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  background: #e3e3e3;
+  border: none;
+  border-radius: 6px;
+}
+
+.name-fields {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.name-fields input {
+  width: 100%;
+}
+
+.method-label {
+  font-weight: bold;
+  color: #112752;
+  margin: 25px 0 10px;
+}
+
+.cancellation-policy {
+  color: #112752;
+}
+
+.payment-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+}
+
+.payment-buttons button {
+  padding: 20px 40px;
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+
+.gcash {
+  background-color: #3b49c0;
+}
+
+.paymaya {
+  background-color: #000;
+}
+
+.gotyme {
+  background-color: #00d1b2;
+}
+
+.bdo {
+  background-color: #3b49c0;
+}
+
+.bpi {
+  background-color: #c82333;
+}
+
+.metrobank {
+  background-color: #8264db;
+}
+
+/* RIGHT PANEL STYLES */
+.booking-box {
+  background-color: #112752;
+  color: white;
+  padding: 25px 20px;
+  border-radius: 15px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+.booking-box h3 {
+  margin-bottom: 5px;
+  font-size: 1.2rem;
+}
+
+.info-box {
+  background-color: #c1923e;
+  padding: 10px;
+  border-radius: 5px;
+  margin: 10px 0;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.total-label {
+  margin-top: 25px;
+  font-size: 0.95rem;
+}
+
+.total-label span {
+  font-size: 0.8rem;
+  color: #ccc;
+}
+
+.price {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin: 12px 0;
+}
+
+.pay-button {
+  background-color: white;
+  color: #112752;
+  border: none;
+  padding: 18px 40px;
+  font-weight: bold;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: block;
+  margin: 20px auto 0;
+}
+
+.total-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-top: 25px;
+}
+
+.total-label {
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.total-label span {
+  font-size: 0.8rem;
+  color: #ccc;
+}
+
+.price {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.pay-button {
+  background-color: white;
+  color: #112752;
+  border: none;
+  padding: 18px 40px;
+  font-weight: bold;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: block;
+  margin: 20px auto 0;
+}
+
+
+/* POPUP MODAL STYLES */
+.popup-overlay {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(3px);
+  justify-content: center;
+  align-items: center;
+}
+
+.popup-overlay.active {
+  display: flex;
+}
+
+.popup-content {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 15px;
+  width: 90%;
+  max-width: 450px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.popup-content h2 {
+  color: #112752;
+  font-weight: 700;
+  font-size: 1.3rem;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.popup-content .payment-note {
+  font-size: 0.85rem;
+  text-align: center;
+  color: #112752;
+  margin-bottom: 20px;
+}
+
+.popup-content .payment-note strong {
+  font-size: 1.5rem;
+  color: #112752;
+}
+
+.popup-content input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: none;
+  border-bottom: 2px solid #ccc;
+  background: transparent;
+  outline: none;
+  font-size: 0.9rem;
+}
+
+.popup-content .secure-msg {
+  font-size: 0.75rem;
+  color: #555;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.popup-content .confirm-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #112752;
+  color: #fff;
+  border: none;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background-color 0.3s ease;
+}
+
+.popup-content .confirm-btn:hover {
+  background-color: #0c1e3f;
+}
+
+.close-btn {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  font-size: 24px;
+  color: #444;
+  cursor: pointer;
+}
+
+/* FOOTER DESIGN */
+.footer {
+  background-color: #0c1e4a;
+  color: white;
+  padding: 40px 60px;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  padding: 0px 50px;
+}
+
+.footer-left {
+  max-width: 450px;
+}
+
+.footer-logo {
+  height: 90px;
+}
+
+.footer-description {
+  color: #ccc;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-top: 10px;
+}
+
+.footer-right {
+  text-align: left;
+}
+
+.footer-contact-title {
+  color: #d6a648;
+  margin-bottom: 10px;
+}
+
+.footer-contact-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-contact-list li {
+  margin-bottom: 8px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.footer-contact-list .icon {
+  color: #d4af37;
+  margin-right: 8px;
+}
+
+.footer-line {
+  position: relative;
+  height: 1px;
+  background-color: white;
+  margin: 30px 0 20px;
+  width: 100%;
+  border: none;
+}
+
+.footer-line::before,
+.footer-line::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  background-color: white;
+  border-radius: 50%;
+}
+
+.footer-line::before {
+  left: 0;
+  transform: translate(-50%, -50%);
+}
+
+.footer-line::after {
+  right: 0;
+  transform: translate(50%, -50%);
+}
+
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #ccc;
+  flex-wrap: wrap;
+}
+
+.footer-links a {
+  color: #ccc;
+  margin-left: 20px;
+  text-decoration: none;
+}
+
+.footer-links a:hover {
+  text-decoration: underline;
+}
