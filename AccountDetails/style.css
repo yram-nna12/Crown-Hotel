@@ -148,7 +148,7 @@ input[readonly] {
   border-radius: 6px;
   font-size: 1em;
   cursor: pointer;
-  margin-top: 10px;
+  margin-top: 50px;
 }
 
 .password-form button:hover {
