@@ -1,116 +1,122 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Crown Tower Hotel</title>
-    <link rel="stylesheet" href="./style.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crown Tower Hotel</title>
+  <link rel="stylesheet" href="./style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <header class="topbar">
-        <div class="logo">
-            <img src="../assets/img/LOGO.png" alt="Crown Tower Logo">
-        </div>
-        <nav class="nav-links">
-            <a href="#" class="btn booking" style="color: #0a2240;">Booking</a>
-            <a href="./index.html" class="btn home" >Home</a>
-            <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid white;" />
-        </nav>
-    </header>
+  <header class="topbar">
+    <div class="logo">
+      <img src="../assets/img/LOGO.png" alt="Crown Tower Logo">
+    </div>
+    <nav class="nav-links">
+      <a href="#" class="btn booking" style="color: #0a2240;">Booking</a>
+      <a href="./index.php" class="btn home">Home</a>
+      <?php if ($is_logged_in): ?>
+        <a href="../AccountDetails/account.php">
+          <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png" alt="Profile"
+               style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid white;" />
+        </a>
+      <?php else: ?>
+        <a href="../LoginPage/login.php" class="btn">Login</a>
+      <?php endif; ?>
+    </nav>
+  </header>
 
-    <section class="hero">
-        <div class="hero-content">
-            <h1 class="tagline">“Where Elegance is for Everyone”</h1>
-            <p>
-                Crown Hotel is your destination for a refined and relaxing stay. We combine modern comfort, elegant design, and exceptional service to create a welcoming experience for every guest. Whether for business or leisure, you'll feel right at home.
-            </p>
+  <section class="hero">
+    <div class="hero-content">
+      <?php if ($is_logged_in): ?>
+        <p class="welcome-msg">Welcome back, <?= htmlspecialchars($user['first_name']) ?>!</p>
+      <?php endif; ?>
+      <h1 class="tagline">“Where Elegance is for Everyone”</h1>
+      <p>
+        Crown Hotel is your destination for a refined and relaxing stay. We combine modern comfort, elegant design, and exceptional service to create a welcoming experience for every guest. Whether for business or leisure, you'll feel right at home.
+      </p>
 
-            <form action="../hotel list/index.html" method="GET" class="search-bar">
-                <div class="field">
-                    <label class="form-label">Location</label>
-                    <input type="text" name="location" placeholder="Where are you staying" required />
-                </div>
-                <div class="field">
-                    <label class="form-label">Check In</label>
-                    <input type="date" name="checkin" required />
-                </div>
-                <div class="field">
-                    <label class="form-label">Check Out</label>
-                    <input type="date" name="checkout" required />
-                </div>
-                <div class="field">
-                    <label class="form-label">Guest</label>
-                    <input type="number" name="guests" placeholder="How many are you" min="1" required />
-                </div>
-                <button type="submit" class="search-btn" title="Search">
-                    <img src="../assets/img/SEARCH.png" alt="Search" />
-                </button>
-            </form>
+      <form action="../hotel list/index.html" method="GET" class="search-bar">
+        <div class="field">
+          <label class="form-label">Location</label>
+          <input type="text" name="location" placeholder="Where are you staying" required />
         </div>
-    </section>
+        <div class="field">
+          <label class="form-label">Check In</label>
+          <input type="date" name="checkin" required />
         </div>
-    </section>
+        <div class="field">
+          <label class="form-label">Check Out</label>
+          <input type="date" name="checkout" required />
+        </div>
+        <div class="field">
+          <label class="form-label">Guest</label>
+          <input type="number" name="guests" placeholder="How many are you" min="1" required />
+        </div>
+        <button type="submit" class="search-btn" title="Search">
+          <img src="../assets/img/SEARCH.png" alt="Search" />
+        </button>
+      </form>
+    </div>
+  </section>
 
+  <section class="recent-bookings">
+    <h2 class="section-title">Recent Books</h2>
 
-    <section class="recent-bookings">
-        <h2 class="section-title">Recent Books</h2>
-      
-        <!-- Booking Card 1 -->
-        <div class="booking-card">
-          <div class="booking-details">
-            <img src="../hotel list/assets/img/28.png" alt="Room Image" class="room-image" />
-            <div class="booking-info">
-              <h3 class="hotel-name">Crown Hotel at <span>Legaspi</span> <span class="book-date">Date Booked</span></h3>
-              <p class="room-type">Deluxe Room</p>
-              <div class="stars">★★★★☆</div>
-              <p class="occupancy">2-4 persons</p>
-              <ul class="amenities">
-                <li>✔ Bed</li>
-                <li>✔ Free Breakfast</li>
-                <li>✔ Free Wifi</li>
-                <li>✔ Free Use of Amenities</li>
-                <li>✔ Free Parking</li>
-              </ul>
-            </div>
-          </div>
-          <div class="booking-status">
-            <div class="price">₱ 1,350</div>
-            <small>Included Tax</small>
-            <button class="pay-now">Pay Now</button>
-          </div>
+    <!-- Booking Card 1 -->
+    <div class="booking-card">
+      <div class="booking-details">
+        <img src="../hotel list/assets/img/28.png" alt="Room Image" class="room-image" />
+        <div class="booking-info">
+          <h3 class="hotel-name">Crown Hotel at <span>Legaspi</span> <span class="book-date">Date Booked</span></h3>
+          <p class="room-type">Deluxe Room</p>
+          <div class="stars">★★★★☆</div>
+          <p class="occupancy">2-4 persons</p>
+          <ul class="amenities">
+            <li>✔ Bed</li>
+            <li>✔ Free Breakfast</li>
+            <li>✔ Free Wifi</li>
+            <li>✔ Free Use of Amenities</li>
+            <li>✔ Free Parking</li>
+          </ul>
         </div>
-      
-        <!-- Booking Card 2 -->
-        <div class="booking-card">
-          <div class="booking-details">
-            <img src="../hotel list/assets/img/antipolo.png" alt="Room Image" class="room-image" />
-            <div class="booking-info">
-              <h3 class="hotel-name">Crown Hotel at <span>San Roque, Rizal</span> <span class="book-date">Date Booked</span></h3>
-              <p class="room-type">Deluxe Room</p>
-              <div class="stars">★★★☆☆</div>
-              <p class="occupancy">2-4 persons</p>
-              <ul class="amenities">
-                <li>✔ Bed</li>
-                <li>✔ Free Breakfast</li>
-                <li>✔ Free Wifi</li>
-                <li>✔ Free Use of Amenities</li>
-                <li>✔ Free Parking</li>
-              </ul>
-            </div>
-          </div>
-          <div class="booking-status">
-            <div class="price">₱ 1,650</div>
-            <small>Included Tax</small>
-            <span class="paid-label">PAID</span>
-          </div>
-        </div>
-      </section>
-      
+      </div>
+      <div class="booking-status">
+        <div class="price">₱ 1,350</div>
+        <small>Included Tax</small>
+        <button class="pay-now">Pay Now</button>
+      </div>
+    </div>
 
-    
-<footer class="footer">
+    <!-- Booking Card 2 -->
+    <div class="booking-card">
+      <div class="booking-details">
+        <img src="../hotel list/assets/img/antipolo.png" alt="Room Image" class="room-image" />
+        <div class="booking-info">
+          <h3 class="hotel-name">Crown Hotel at <span>San Roque, Rizal</span> <span class="book-date">Date Booked</span></h3>
+          <p class="room-type">Deluxe Room</p>
+          <div class="stars">★★★☆☆</div>
+          <p class="occupancy">2-4 persons</p>
+          <ul class="amenities">
+            <li>✔ Bed</li>
+            <li>✔ Free Breakfast</li>
+            <li>✔ Free Wifi</li>
+            <li>✔ Free Use of Amenities</li>
+            <li>✔ Free Parking</li>
+          </ul>
+        </div>
+      </div>
+      <div class="booking-status">
+        <div class="price">₱ 1,650</div>
+        <small>Included Tax</small>
+        <span class="paid-label">PAID</span>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
     <div class="footer-content">
       <div class="footer-left">
         <img src="../assets/img/LOGO.png" alt="Crown Hotel Logo" class="footer-logo">
@@ -127,10 +133,9 @@
         </ul>
       </div>
     </div>
-  
-    <!-- Updated line with white circles -->
+
     <div class="footer-line"></div>
-  
+
     <div class="footer-bottom">
       <span>@2025 CrownHotel All Rights Reserved</span>
       <div class="footer-links">
@@ -139,6 +144,5 @@
       </div>
     </div>
   </footer>
-
 </body>
 </html>
