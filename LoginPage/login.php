@@ -74,7 +74,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $updateStmt->close();
 
         unset($_SESSION['login_error']);
-        header("Location: dashboard.php");
+        header("Location: ../../../../Crown-Hotel/user_landing_page/index.php");
         exit;
     } else {
         $_SESSION['login_error'] = "Invalid email or password.";

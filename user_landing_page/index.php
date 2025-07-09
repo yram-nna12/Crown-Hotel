@@ -17,22 +17,13 @@
     <nav class="nav-links">
       <a href="#" class="btn booking" style="color: #0a2240;">Booking</a>
       <a href="./index.php" class="btn home">Home</a>
-      <?php if ($is_logged_in): ?>
-        <a href="../AccountDetails/account.php">
-          <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png" alt="Profile"
-               style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid white;" />
-        </a>
-      <?php else: ?>
-        <a href="../LoginPage/login.php" class="btn">Login</a>
-      <?php endif; ?>
+      <a href="../AccountDetails/account.php" class="btn home">Account</a>
     </nav>
   </header>
 
   <section class="hero">
     <div class="hero-content">
-      <?php if ($is_logged_in): ?>
-        <p class="welcome-msg">Welcome back, <?= htmlspecialchars($user['first_name']) ?>!</p>
-      <?php endif; ?>
+    
       <h1 class="tagline">“Where Elegance is for Everyone”</h1>
       <p>
         Crown Hotel is your destination for a refined and relaxing stay. We combine modern comfort, elegant design, and exceptional service to create a welcoming experience for every guest. Whether for business or leisure, you'll feel right at home.
