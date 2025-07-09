@@ -1,0 +1,512 @@
+/* style.css */
+
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background-color: #f8f9fc;
+}
+
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+
+.logo {
+  margin-bottom: 40px;
+}
+
+.logo-img {
+  width: 80%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.menu {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.menu a {
+  display: block;
+  width: 100%;
+  padding: 15px 0;
+  text-align: center;
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.menu a:hover,
+.menu a.active {
+  background-color: #c3a559;
+  color: white;
+}
+
+.profile {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.profile img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+
+/* Sidebar */
+.sidebar {
+  width: 220px;
+  background-color: #122142;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0;
+  position: fixed; /* Added this line */
+  height: 100vh; /* Added this line to ensure it takes full viewport height */
+  top: 0; /* Added this line to position it at the top */
+  left: 0; /* Added this line to position it at the left */
+}
+
+.main-content {
+    flex-grow: 1;
+    padding: 40px;
+    background-color: #f8f9fc;
+    margin-left: 220px; /* Added this line - should match sidebar width */
+}
+
+
+/* Styles for Bookings Page Content */
+.bookings-header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.bookings-header-container h2 {
+    color: #122142;
+    font-size: 2.5em;
+    margin: 0;
+}
+
+.total-booked-count {
+    color: #c3a559;
+    font-weight: 600;
+}
+
+.add-booking-icon {
+    background-color: #122142;
+    color: white;
+    font-size: 2em;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.bookings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.booking-card {
+    background-color: #122142;
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px 25px;
+}
+
+.booking-card .card-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.booking-card .header-row {
+    align-items: center;
+}
+
+.booking-info-left {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+}
+
+.customer-name {
+    font-weight: 600;
+    font-size: 1.3em;
+    margin-right: 15px;
+}
+
+.status-tag {
+    font-size: 0.8em;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.status-tag.paid {
+    color: #4CAF50;
+}
+
+.status-tag.cancelled {
+    color: #F44336;
+}
+
+.status-tag.pending {
+    color: #FFC107;
+}
+
+.booking-icons {
+    display: flex;
+    gap: 15px;
+}
+
+/* In your style.css */
+
+.booking-icons a { /* Changed from .booking-icons span */
+    font-size: 1.2em;
+    cursor: pointer;
+    color: white; /* This will now apply to the <a> tags */
+    text-decoration: none; /* Add this to remove the default underline on links */
+}
+
+/* You might want to keep specific styling for the individual icons if needed,
+   but for color, the 'a' selector should be enough. */
+/* If you want to be super specific: */
+.booking-icons .edit-icon,
+.booking-icons .delete-icon {
+    color: white;
+    text-decoration: none;
+}
+
+.booking-card .details-row p {
+    margin: 5px 0;
+    font-size: 0.95em;
+    color: #e0e0e0;
+}
+
+.booking-card .details-row {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 0;
+}
+
+
+/* Add these styles to your existing assets/css/style.css file */
+
+/* --- Modal Styles (if not already present or for additions) --- */
+/* The general .modal, .modal-content, .close-button, .form-group, .button-group 
+   styles should largely be covered by previous instructions.
+   Ensure these specific styles are included: */
+
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1000; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0,0,0,0.7); /* Black w/ opacity */
+    padding-top: 60px; /* Space from the top */
+}
+
+.modal-content {
+    background-color: #122142; /* Dark blue background */
+    color: white;
+    margin: 5% auto; /* 5% from the top and centered */
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    max-width: 600px; /* Adjust as needed */
+    position: relative; /* For absolute positioning of close button */
+}
+
+.close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    position: absolute; /* Position relative to modal-content */
+    top: 10px;
+    right: 20px;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* --- Form Specific Styles for Modal --- */
+/* These are the styles for the form elements *inside* the modal */
+.modal-content h2 {
+    color: white;
+    margin-bottom: 25px;
+    font-size: 2em;
+    display: flex;
+    align-items: center;
+}
+.modal-content h2 .edit-icon,
+.modal-content h2 .add-booking-icon { /* Added add-booking-icon for the title icon */
+    font-size: 0.8em;
+    margin-left: 10px;
+    color: #c3a559; /* Gold-like color */
+}
+.form-group {
+    margin-bottom: 20px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #e0e0e0; /* Light gray for labels */
+}
+.form-group input[type="text"],
+.form-group input[type="date"],
+.form-group input[type="number"],
+.form-group select {
+    width: calc(100% - 20px); /* Adjust for padding */
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #c3a559; /* Gold border */
+    background-color: #f8f9fc; /* Off-white input background */
+    color: #122142; /* Dark blue text for input */
+    font-size: 1em;
+    box-sizing: border-box; /* Include padding in width */
+}
+.form-group input[type="text"]:focus,
+.form-group input[type="date"]:focus,
+.form-group input[type="number"]:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #ffda6a; /* Lighter gold on focus */
+    box-shadow: 0 0 5px rgba(195, 165, 89, 0.5); /* Soft shadow on focus */
+}
+/* Custom dropdown arrow for selects */
+.form-group select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23122142%22%20d%3D%22M287%2069.9H5.4c-6.1%200-9.2%207.3-5.1%2011.4L136.9%20227.5c3.2%203.2%208.5%203.2%2011.7%200l136.5-146.2c4.1-4.1%201-11.4-5.1-11.4z%22%2F%3E%3C%2Fsvg%3E');
+    background-repeat: no-repeat;
+    background-position: right 10px top 50%;
+    background-size: 12px;
+}
+.button-group {
+    display: flex;
+    justify-content: flex-end; /* Align buttons to the right */
+    gap: 15px; /* Space between buttons */
+    margin-top: 30px;
+}
+.button-group button {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+.button-group .save-button {
+    background-color: #c3a559; /* Gold button */
+    color: #122142; /* Dark blue text */
+}
+.button-group .save-button:hover {
+    background-color: #ffda6a; /* Lighter gold on hover */
+}
+.button-group .cancel-button {
+    background-color: #6c757d; /* Gray button */
+    color: white;
+}
+.button-group .cancel-button:hover {
+    background-color: #5a6268; /* Darker gray on hover */
+}
+.error-message {
+    color: #F44336; /* Red for errors */
+    margin-top: 10px;
+    text-align: center;
+}
+.check-in-out-group {
+    display: flex;
+    gap: 20px; /* Space between check-in and check-out fields */
+}
+.check-in-out-group .form-group {
+    flex: 1; /* Make them take equal space */
+}
+.payment-details-group {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px dashed #c3a559; /* Separator for payment details */
+}
+.payment-details-group h3 {
+    color: #c3a559;
+    margin-bottom: 15px;
+    font-size: 1.2em;
+}
+.amount-status-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end; /* Align amount at bottom, status input at bottom */
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px dashed #c3a559; /* Separator for amount and status */
+}
+.amount-status-group .form-group {
+    flex: 1; /* Make them take equal space */
+    margin-bottom: 0; /* Remove default bottom margin */
+}
+.amount-display {
+    font-size: 2em;
+    font-weight: bold;
+    color: #c3a559;
+    margin-right: 20px;
+    display: flex; /* To align P and input */
+    align-items: center;
+}
+.amount-display span {
+    color: white; /* For the "₱" symbol */
+}
+.total-amount-display {
+    display: flex;
+    align-items: center;
+}
+.status-select {
+    min-width: 150px;
+}
+
+/* --- Notification for success/error pop-ups --- */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #4CAF50; /* Green for success */
+    color: white;
+    padding: 15px 20px;
+    border-radius: 5px;
+    z-index: 1001; /* Ensure it's above the modal */
+    display: none; /* Hidden by default */
+    opacity: 0; /* Start invisible for transition */
+    transition: opacity 0.5s ease-in-out; /* Smooth fade in/out */
+}
+.notification.error {
+    background-color: #F44336; /* Red for error */
+}
+
+/* Specific style for the main add booking icon */
+.add-booking-icon {
+    font-size: 2em; /* Make it large and visible */
+    font-weight: bold;
+    color: white;
+    background-color: #c3a559; /* Gold circle */
+    border-radius: 50%; /* Make it a circle */
+    width: 40px; /* Fixed width */
+    height: 40px; /* Fixed height */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-decoration: none; /* Remove underline if it was an anchor */
+}
+
+.add-booking-icon:hover {
+    background-color: #ffda6a; /* Lighter gold on hover */
+}
+
+/* Ensure the header container correctly aligns the elements */
+.bookings-header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.add-booking-icon {
+    font-size: 2em; /* Make it large and visible */
+    font-weight: bold;
+    color: white;
+    background-color: #c3a559; /* Gold circle */
+    border-radius: 50%; /* Make it a circle */
+    width: 40px; /* Fixed width */
+    height: 40px; /* Fixed height */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-decoration: none; /* Remove underline if it was an anchor */
+}
+
+.add-booking-icon:hover {
+    background-color: #ffda6a; /* Lighter gold on hover */
+}
+
+/* Ensure the header container correctly aligns the elements */
+.bookings-header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* --- Modal Close Buttons (general styles for both, if not already present) --- */
+/* The .close-button class should already exist and apply to both. */
+/* No new distinct styles needed here unless you want separate looks for add/edit close buttons */
+
+/* --- Modal Title Icons (to differentiate from the main add button) --- */
+/* This ensures the edit icon in the title stays the same, and the '+' in add modal title is consistent */
+.modal-content h2 .edit-icon {
+    font-size: 0.8em; /* Smaller size for title icon */
+    margin-left: 10px;
+    color: #c3a559; /* Gold-like color */
+    /* Add any other specific styles for the edit icon in the title here */
+}
+
+/* Style for the '+' icon within the "Add New Booking" modal title (it's just a span) */
+.modal-content h2 span { /* Targeting the span directly inside h2 for the add modal's title icon */
+    font-size: 0.8em; /* Adjust size if different from general h2 font-size */
+    margin-left: 10px;
+    color: #c3a559; /* Gold-like color */
+    /* This ensures it gets similar styling to the edit-icon in the other modal title */
+}
+
+
+/* --- Notification for success/error pop-ups (re-included for completeness) --- */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #4CAF50; /* Green for success */
+    color: white;
+    padding: 15px 20px;
+    border-radius: 5px;
+    z-index: 1001; /* Ensure it's above the modal */
+    display: none; /* Hidden by default */
+    opacity: 0; /* Start invisible for transition */
+    transition: opacity 0.5s ease-in-out; /* Smooth fade in/out */
+}
+.notification.error {
+    background-color: #F44336; /* Red for error */
+}
