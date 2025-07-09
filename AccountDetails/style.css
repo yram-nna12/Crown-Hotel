@@ -43,8 +43,6 @@ body {
 
 .nav-links a {
     text-decoration: none;
-    color: #fff;
-    font-weight: 500;
 }
 
 .btn {
@@ -95,6 +93,20 @@ h1 {
   font-size: 1rem;
   cursor: pointer;
   margin-left: 10px;
+}
+.booking {
+    background-color: #ffffff;
+    color: #d9a441; /* Gold text */
+    padding: 0.5rem 1.5rem;
+    font-weight: 600;
+}
+
+.home {
+    background: transparent;
+    color: #d9a441;
+    font-weight: 700;
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
 }
 
 .form-group {
