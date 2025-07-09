@@ -16,8 +16,8 @@
         <nav class="nav-links">
             <a href="#">Home</a>
             <a href="#">About Us</a>
-            <a href="#" class="btn login">Log in</a>
-            <a href="#" class="btn signup">Sign up</a>
+            <a href="./LoginPage/login.html" class="btn login" style="color: #0a2240;">Log in</a>
+            <a href="./Signup_page/index.html" class="btn signup" >Sign up</a>
         </nav>
     </header>
 
