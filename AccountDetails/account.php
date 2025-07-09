@@ -65,7 +65,7 @@ $user = $result->fetch_assoc();
       <img src="../assets/img/LOGO.png" alt="Crown Tower Logo">
     </div>
     <nav class="nav-links">
-      <a href="../index.php" class="btn home">Home</a>
+      <a href="../user_landing_page/index.php" class="btn home">Home</a>
       <a href="#">My Account</a>
     </nav>
   </header>
