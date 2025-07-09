@@ -1,37 +1,38 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background-color: #f9f9f9;
 }
 
 body {
-    font-family: 'Poppins', sans-serif;
-}
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background-color: #ffffff;
 
-/* NAVIGATION BAR */
-.topbar {
-    background-color: #112752;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 3rem;
-    position: sticky;
-    top: 0;
-    z-index: 999;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}.topbar {
+  background-color: #0a2240; /* Dark navy blue */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 3rem;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
-
+/* Logo Section */
 .logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 1.5rem;
-    color: #fff;
-    font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.5rem;
+  color: #fff;
+  font-weight: 600;
 }
+
 
 .logo img {
-    height: 90px;
+  height: 100px;
 }
 
 .nav-links {
@@ -68,7 +69,6 @@ body {
 .account-container {
   max-width: 700px;
   margin: 80px auto;
-  background: #ffffff;
   padding: 40px;
 }
 
