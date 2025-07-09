@@ -28,7 +28,7 @@
                 Crown Hotel is your destination for a refined and relaxing stay. We combine modern comfort, elegant design, and exceptional service to create a welcoming experience for every guest. Whether for business or leisure, you'll feel right at home.
             </p>
 
-            <form action="search-results.php" method="GET" class="search-bar">
+            <form action="./hotel list/index.html" method="GET" class="search-bar">
                 <div class="field">
                     <label class="form-label">Location</label>
                     <input type="text" name="location" placeholder="Where are you staying" required />
@@ -49,6 +49,8 @@
                     <img src="./assets/img/SEARCH.png" alt="Search" />
                 </button>
             </form>
+        </div>
+    </section>
         </div>
     </section>
 

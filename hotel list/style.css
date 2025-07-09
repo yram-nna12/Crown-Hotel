@@ -141,7 +141,6 @@ input[type="date"] {
 
 .hotel-card {
   background-color: white;
-  display: flex;
   justify-content: space-between;
   border-radius: 10px;
   padding: 20px;
@@ -149,6 +148,8 @@ input[type="date"] {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   transition: 0.3s;
+  display: none;
+  cursor: pointer;
 }
 
 .hotel-card:hover {
@@ -276,6 +277,7 @@ input[type="date"] {
   margin-right: 8px;
 }
 
+
 .footer-line {
   position: relative;
   height: 1px;
@@ -285,6 +287,7 @@ input[type="date"] {
   border: none;
 }
 
+/* Small white circles */
 .footer-line::before,
 .footer-line::after {
   content: '';
@@ -307,6 +310,7 @@ input[type="date"] {
   transform: translate(50%, -50%);
 }
 
+
 .footer-bottom {
   display: flex;
   justify-content: space-between;
@@ -324,3 +328,4 @@ input[type="date"] {
 .footer-links a:hover {
   text-decoration: underline;
 }
+
