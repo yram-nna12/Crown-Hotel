@@ -1,15 +1,24 @@
 <?php
 session_start();
-require_once __DIR__ . '/../config.php'; // connect to database
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $host = "localhost";
+    $username = "root";
+    $password = "";
+    $database = "crown_db";
+
+    $conn = new mysqli($host, $username, $password, $database);
+
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
 
     $email = trim($_POST['email'] ?? '');
     $input_password = $_POST['password'] ?? ''; 
 
     if (empty($email) || empty($input_password)) {
         $_SESSION['login_error'] = "Please enter both email and password.";
-        header("Location: login.html");
+        header("Location: index.php"); 
         exit;
     }
 
@@ -22,39 +31,44 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->execute();
     $stmt->store_result(); 
 
-    if ($stmt->num_rows > 0) {
-        $stmt->bind_result($user_id, $db_email, $hashed_password_from_db);
-        $stmt->fetch();
+    if ($stmt->num_rows === 0) {
+        $_SESSION['login_error'] = "Account not found. Please sign up first.";
+        header("Location: ../Signup_page/index.php");
+        exit;
+    }
 
-        if (password_verify($input_password, $hashed_password_from_db)) {
-            $_SESSION['user_id'] = $user_id;
-            $_SESSION['user_email'] = $db_email;
-            $_SESSION['logged_in'] = true;
+    $stmt->bind_result($user_id, $db_email, $hashed_password_from_db);
+    $stmt->fetch();
 
-            setcookie("user_email", $db_email, time() + (86400 * 7), "/");
-            setcookie("login_time", date("Y-m-d H:i:s"), time() + (86400 * 7), "/");
+    if (password_verify($input_password, $hashed_password_from_db)) {
+        $_SESSION['user_id'] = $user_id;
+        $_SESSION['user_email'] = $db_email;
+        $_SESSION['logged_in'] = true;
 
-            // Optional: update last login time if `last_login` column exists
-            @$conn->query("UPDATE users SET last_login = NOW() WHERE id = $user_id");
+        setcookie("user_email", $db_email, time() + (86400 * 7), "/");
+        setcookie("login_time", date("Y-m-d H:i:s"), time() + (86400 * 7), "/");
 
-            unset($_SESSION['login_error']);
-            header("Location: dashboard.php");
-            exit;
-        } else {
-            $_SESSION['login_error'] = "Invalid email or password.";
-            header("Location: login.html");
-            exit;
-        }
+        $updateStmt = $conn->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
+        $updateStmt->bind_param("i", $user_id);
+        $updateStmt->execute();
+        $updateStmt->close();
+
+        unset($_SESSION['login_error']);
+
+        header("Location: dashboard.php");
+        exit;
+
     } else {
         $_SESSION['login_error'] = "Invalid email or password.";
-        header("Location: login.html");
+        header("Location: index.php");
         exit;
     }
 
     $stmt->close();
     $conn->close();
 } else {
-    header("Location: login.html");
+    header("Location: index.php");
     exit;
 }
-?>
+
+

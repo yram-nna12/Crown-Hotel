@@ -1,3 +1,9 @@
+<?php
+session_start();
+$error = $_SESSION['login_error'] ?? '';
+unset($_SESSION['login_error']);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,6 +26,8 @@
       <form action="login.php" method="POST" class="form">
         <h2>LOG IN</h2>
 
+         <?php if (!empty($error)) echo "<div class='error'>$error</div>"; ?>
+
         <div class="form-group">
           <input type="email" name="email" placeholder="example@gmail.com" required/>
         </div>
@@ -40,7 +48,7 @@
         <div class="social-icons">
 
           <a href="https://www.facebook.com/" target="_blank">
-          <img src="./assets/images/facebook.png"  alt="Facebook" /></a>
+          <img src="./assets/images/facebook.png"  alt="Facebook" /></a>
 
           <a href="https://www.google.co.uk/" target="_blank">
           <img src="./assets/images/google.png" alt="Google" /></a>
