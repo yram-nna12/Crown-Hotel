@@ -31,7 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['admin_email'] = $admin_email;
             $_SESSION['is_admin'] = true;
 
-            header("Location: admin_dashboard.php");
+            header("Location: ../../../../Crown-Hotel/Dashboard/index.php");
             exit;
         } else {
             $_SESSION['login_error'] = "Invalid email or password.";
