@@ -15,7 +15,7 @@
       <img src="../assets/img/LOGO.png" alt="Crown Tower Logo">
     </div>
     <nav class="nav-links">
-      <a href="#" class="btn booking" style="color: #0a2240;">Booking</a>
+      <a href="../user_hotel_list/index.html" class="btn booking" style="color: #0a2240;">Booking</a>
       <a href="./index.php" class="btn home">Home</a>
       <a href="../AccountDetails/account.php" class="btn home">Account</a>
     </nav>
