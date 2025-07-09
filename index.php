@@ -16,8 +16,8 @@
         <nav class="nav-links">
             <a href="#">Home</a>
             <a href="#">About Us</a>
-            <button class="btn login">LOG IN</button>
-            <button class="btn signup">SIGN UP</button>
+            <a href="#" class="btn login">Log in</a>
+            <a href="#" class="btn signup">Sign up</a>
         </nav>
     </header>
 
