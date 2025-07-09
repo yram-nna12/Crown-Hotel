@@ -9,17 +9,18 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <header class="topbar">
-        <div class="logo">
-            <img src="./assets/img/LOGO.png" alt="Crown Tower Logo">
-        </div>
-        <nav class="nav-links">
-            <a href="#">Home</a>
-            <a href="#">About Us</a>
-            <button class="btn login">LOG IN</button>
-            <button class="btn signup">SIGN UP</button>
-        </nav>
-    </header>
+<header class="topbar">
+  <div class="logo">
+    <img src="./assets/img/LOGO.png" alt="Crown Tower Logo">
+  </div>
+  <nav class="nav-links">
+    <a href="#">Home</a>
+    <a href="#">About Us</a>
+    <a href="#" class="btn login">LOG IN</a>
+    <a href="#" class="btn signup">SIGN UP</a>
+  </nav>
+</header>
+
 
     <section class="hero">
         <div class="hero-content">
