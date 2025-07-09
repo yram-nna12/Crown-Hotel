@@ -1,17 +1,8 @@
 <?php
 session_start();
+require_once __DIR__ . '/../config.php'; // Correct path to config.php
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $host = "localhost";
-    $username = "root";
-    $password = "";
-    $database = "crown_db";
-
-    $conn = new mysqli($host, $username, $password, $database);
-
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
 
     $first_name = trim($_POST['first_name'] ?? '');
     $last_name = trim($_POST['last_name'] ?? '');
@@ -40,15 +31,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
+    // Prepare and execute the insert statement
     $stmt = $conn->prepare("INSERT INTO users (first_name, last_name, email, phone, password) VALUES (?, ?, ?, ?, ?)");
     $stmt->bind_param("sssss", $first_name, $last_name, $email, $phone, $hashed_password);
 
     if ($stmt->execute()) {
         $_SESSION['register_success'] = "Account created successfully! Please log in.";
-        header("Location: login.html");
+        header("Location: ../LoginPage/login.html");
+        exit;
     } else {
         $_SESSION['register_error'] = "Error: " . $stmt->error;
         header("Location: index.html");
+        exit;
     }
 
     $stmt->close();
