@@ -15,13 +15,12 @@
 <body>
   <header class="topbar">
     <div class="logo">
-      <img src="./assets/img/LOGO.png" alt="Crown Tower Logo">
+      <img src="../assets/img/LOGO.png" alt="Crown Tower Logo">
     </div>
     <nav class="nav-links">
-      <a href="../index.php">Home</a>
-      <a href="../AboutUs/index.php">About Us</a>
-      <a href="../LoginPage/index.php" class="btn login" style="color: #0a2240;">Log in</a>
-      <a href="../Signup_page/index.php" class="btn signup">Sign up</a>
+      <a href="" class="btn booking" style="color:  #0a2240; background-color: #ffffff; font-weight: 600;">Booking</a>
+      <a href="../user_landing_page/index.php" style="color:  #d9a441; font-weight: 600;" class="btn home">Home</a>
+      <a href="../"style="color:  #d9a441; font-weight: 600;" class="btn home" class="btn home">Account</a>
     </nav>
   </header>
 

@@ -22,9 +22,8 @@ main.payment {
   gap: 40px;
 }
 
-/* NAVIGATION BAR */
 .topbar {
-  background-color: #112752;
+  background-color: #0a2240; /* Dark navy blue */
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -35,40 +34,61 @@ main.payment {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-.logo img {
-  height: 90px;
+/* Logo Section */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.5rem;
+  color: #fff;
+  font-weight: 600;
 }
 
+.logo img {
+  height: 100px;
+}
+
+/* Navigation Links */
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 2rem;
+  gap: 1.5rem;
   padding-right: 1rem;
 }
 
+/* Link Styles */
 .nav-links a {
   text-decoration: none;
-  color: #fff;
-  font-weight: 500;
-}
-
-.btn {
-  padding: 0.7rem 1.8rem;
-  border: none;
-  border-radius: 6px;
   font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+
+/* Booking Button */
+.booking {
+  background-color: #ffffff;
+  color: #d9a441; /* Gold text */
+  padding: 0.5rem 1.5rem;
+  font-weight: 600;
+}
+
+/* Home Button */
+.home {
+  background: transparent;
+  color: #d9a441; /* Gold */
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+}
+
+/* Common Button Styling */
+.btn {
+  border: none;
   cursor: pointer;
-  font-size: 0.9rem;
-}
-
-.login {
-  background: #fff;
-  color: #0a2240;
-}
-
-.signup {
-  background: #d9a441;
-  color: #fff;
+  font-size: 0.95rem;
 }
 
 /* FORM SECTIONS */
