@@ -1,10 +1,17 @@
 <?php
+// booking/index.php
 
+// --- DEBUGGING: Enable full error reporting for development ---
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+// -----------------------------------------------------------
 
-require_once '../../config.php'; 
+// Include your database connection file
+require_once '../../config.php'; // Corrected path based on previous error resolution
 
+// --- Database Operations (Handle POST/GET requests first) ---
+
+// Start session to store notification messages and ensure it's at the very top
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
@@ -40,7 +47,10 @@ if (isset($_POST['add_booking'])) {
     if (!empty($first_name) && !empty($room_type) && !empty($hotel_branch) && !empty($check_in) && !empty($check_out) && !empty($payment_type) && $amount !== false && !empty($status)) {
         $stmt = $conn->prepare("INSERT INTO booking_db (transaction_id, first_name, last_name, room_type, hotel_branch, check_in, check_out, payment_type, payment_method_detail, account_number, account_name, amount, status, reservation_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         if ($stmt) {
-           
+            // FIX: Corrected the type definition string to match the 14 variables
+            // s: transaction_id, s: first_name, s: last_name, s: room_type, s: hotel_branch,
+            // s: check_in, s: check_out, s: payment_type, s: payment_method_detail, s: account_number,
+            // s: account_name, d: amount, s: status, s: reservation_date
             $stmt->bind_param("sssssssssssdss", 
                 $transaction_id, 
                 $first_name, 
@@ -52,7 +62,7 @@ if (isset($_POST['add_booking'])) {
                 $payment_type, 
                 $payment_method_detail, 
                 $account_number, 
-                $account_name, // This was the missing 's' and where 'd' was misplaced
+                $account_name, 
                 $amount, 
                 $status, 
                 $reservation_date
@@ -144,7 +154,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['db_id'
                     $_SESSION['notification_type'] = "success";
                 } else {
                     $_SESSION['notification_message'] = "Booking ID " . $id_to_delete . " not found or already deleted.";
-                    $_SESSION['notification_type'] = "info";
+                    $_SESSION['notification_message'] = "info";
                 }
             } else {
                 $_SESSION['notification_message'] = "Error deleting booking: " . $stmt->error;
@@ -189,22 +199,22 @@ if ($result) {
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $bookings[] = [
-                'id' => htmlspecialchars($row['id']), // Use the actual integer ID here
-                'transaction_id' => htmlspecialchars($row['transaction_id']), // Keep this if needed for display
-                'first_name' => htmlspecialchars($row['first_name']),
-                'last_name' => htmlspecialchars($row['last_name']),
-                'customer_name' => htmlspecialchars($row['first_name'] . ' ' . $row['last_name']),
-                'status' => htmlspecialchars($row['status']),
-                'room_type' => htmlspecialchars($row['room_type']),
-                'hotel_branch' => htmlspecialchars($row['hotel_branch']),
-                'check_in' => htmlspecialchars($row['check_in']),
-                'check_out' => htmlspecialchars($row['check_out']),
-                'payment_type' => htmlspecialchars($row['payment_type']),
-                'payment_method_detail' => htmlspecialchars($row['payment_method_detail']),
-                'account_number' => htmlspecialchars($row['account_number']),
-                'account_name' => htmlspecialchars($row['account_name']),
-                'amount' => htmlspecialchars(number_format((float)$row['amount'], 2, '.', '')),
-                'raw_amount' => (float)$row['amount'] // Keep raw float for modal population
+                'id' => htmlspecialchars($row['id'] ?? ''), // FIX: Handle potential NULL
+                'transaction_id' => htmlspecialchars($row['transaction_id'] ?? ''), // FIX: Handle potential NULL
+                'first_name' => htmlspecialchars($row['first_name'] ?? ''),
+                'last_name' => htmlspecialchars($row['last_name'] ?? ''),
+                'customer_name' => htmlspecialchars(($row['first_name'] ?? '') . ' ' . ($row['last_name'] ?? '')),
+                'status' => htmlspecialchars($row['status'] ?? ''),
+                'room_type' => htmlspecialchars($row['room_type'] ?? ''),
+                'hotel_branch' => htmlspecialchars($row['hotel_branch'] ?? ''),
+                'check_in' => htmlspecialchars($row['check_in'] ?? ''),
+                'check_out' => htmlspecialchars($row['check_out'] ?? ''),
+                'payment_type' => htmlspecialchars($row['payment_type'] ?? ''),
+                'payment_method_detail' => htmlspecialchars($row['payment_method_detail'] ?? ''),
+                'account_number' => htmlspecialchars($row['account_number'] ?? ''),
+                'account_name' => htmlspecialchars($row['account_name'] ?? ''),
+                'amount' => htmlspecialchars(number_format((float)($row['amount'] ?? 0), 2, '.', '')), // FIX: Handle potential NULL for amount
+                'raw_amount' => (float)($row['amount'] ?? 0) // Keep raw float for modal population
             ];
         }
     }
