@@ -1,75 +1,239 @@
 <?php
-// This is a placeholder for your database connection.
-// In a real application, you would include your database connection file here.
-// For now, we'll simulate data.
+// booking/index.php
 
-// Include your database connection file once it's ready:
-// include_once 'path/to/your/database_connection.php';
+// --- DEBUGGING: Enable full error reporting for development ---
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+// -----------------------------------------------------------
 
-// Simulated booking data. In a real scenario, this would come from your database.
-// Each array represents a row from your 'bookings' table.
-// IMPORTANT: Expanded data to include all fields needed for the edit modal.
-$bookings = [
-    [
-        'id' => 1,
-        'customer_name' => 'Mary Ann B. Camacho',
-        'status' => 'paid',
-        'room_type' => 'Suite Room',
-        'hotel_branch' => 'Crown Hotel at Legaspi',
-        'check_in' => '2025-07-17', // Added for modal
-        'check_out' => '2025-07-20', // Added for modal
-        'payment_type' => 'E-Wallet/E-Money Payment',
-        'payment_method_detail' => 'GCASH', // Added for modal
-        'account_number' => '0956212135168', // Added for modal
-        'account_name' => 'Mary Ann Camacho', // Added for modal
-        'amount' => 1200.00 // Added for modal
-    ],
-    [
-        'id' => 2,
-        'customer_name' => 'John Doe',
-        'status' => 'cancelled',
-        'room_type' => 'Deluxe Room',
-        'hotel_branch' => 'Crown Hotel at Cebu',
-        'check_in' => '2025-08-01',
-        'check_out' => '2025-08-05',
-        'payment_type' => 'Credit Card',
-        'payment_method_detail' => 'Visa',
-        'account_number' => '**** **** **** 1234',
-        'account_name' => 'John Doe',
-        'amount' => 2500.00
-    ],
-    [
-        'id' => 3,
-        'customer_name' => 'Jane Smith',
-        'status' => 'pending',
-        'room_type' => 'Standard Room',
-        'hotel_branch' => 'Crown Hotel at Davao',
-        'check_in' => '2025-09-10',
-        'check_out' => '2025-09-12',
-        'payment_type' => 'Bank Transfer',
-        'payment_method_detail' => 'BDO',
-        'account_number' => '***********9876',
-        'account_name' => 'Jane Smith',
-        'amount' => 800.00
-    ],
-    [
-        'id' => 4,
-        'customer_name' => 'Robert Johnson',
-        'status' => 'paid',
-        'room_type' => 'Family Room',
-        'hotel_branch' => 'Crown Hotel at Boracay',
-        'check_in' => '2025-10-20',
-        'check_out' => '2025-10-25',
-        'payment_type' => 'Cash',
-        'payment_method_detail' => 'N/A',
-        'account_number' => 'N/A',
-        'account_name' => 'Robert Johnson',
-        'amount' => 3000.00
-    ]
-];
+// Include your database connection file
+require_once '../../config.php'; // Corrected path based on previous error resolution
+
+// --- Database Operations (Handle POST/GET requests first) ---
+
+// Start session to store notification messages and ensure it's at the very top
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Handle ADD Booking
+if (isset($_POST['add_booking'])) {
+    error_log("PHP: add_booking POST request received."); // Debugging log
+    // Sanitize and validate inputs
+    $customer_name_full = $_POST['new_customer_name'] ?? '';
+    $name_parts = explode(' ', $customer_name_full, 2); // Split into at most 2 parts
+    $first_name = $conn->real_escape_string($name_parts[0] ?? '');
+    $last_name = $conn->real_escape_string($name_parts[1] ?? '');
+
+    $room_type = $conn->real_escape_string($_POST['new_room_type'] ?? '');
+    $hotel_branch = $conn->real_escape_string($_POST['new_hotel_branch'] ?? '');
+    $check_in = $conn->real_escape_string($_POST['new_check_in_date'] ?? '');
+    $check_out = $conn->real_escape_string($_POST['new_check_out_date'] ?? '');
+    $payment_type = $conn->real_escape_string($_POST['new_payment_type'] ?? '');
+    $payment_method_detail = $conn->real_escape_string($_POST['new_payment_method_detail'] ?? '');
+    $account_number = $conn->real_escape_string($_POST['new_account_number'] ?? '');
+    $account_name = $conn->real_escape_string($_POST['new_account_name'] ?? '');
+    $amount = filter_var($_POST['new_amount'] ?? 0, FILTER_VALIDATE_FLOAT);
+    $status = $conn->real_escape_string($_POST['new_status'] ?? '');
+    $reservation_date = date('Y-m-d H:i:s'); // Current timestamp
+
+    // Generate a simple transaction_id (you might want a more robust method)
+    $transaction_id = 'TRN-' . uniqid(); 
+
+    // Debugging: Log all received POST data
+    error_log("PHP: Received POST data: " . print_r($_POST, true));
+    error_log("PHP: Generated transaction_id: " . $transaction_id);
+
+    if (!empty($first_name) && !empty($room_type) && !empty($hotel_branch) && !empty($check_in) && !empty($check_out) && !empty($payment_type) && $amount !== false && !empty($status)) {
+        $stmt = $conn->prepare("INSERT INTO booking_db (transaction_id, first_name, last_name, room_type, hotel_branch, check_in, check_out, payment_type, payment_method_detail, account_number, account_name, amount, status, reservation_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        if ($stmt) {
+            // FIX: Corrected the type definition string to match the 14 variables
+            // s: transaction_id, s: first_name, s: last_name, s: room_type, s: hotel_branch,
+            // s: check_in, s: check_out, s: payment_type, s: payment_method_detail, s: account_number,
+            // s: account_name, d: amount, s: status, s: reservation_date
+            $stmt->bind_param("sssssssssssdss", 
+                $transaction_id, 
+                $first_name, 
+                $last_name, 
+                $room_type, 
+                $hotel_branch, 
+                $check_in, 
+                $check_out, 
+                $payment_type, 
+                $payment_method_detail, 
+                $account_number, 
+                $account_name, // This was the missing 's' and where 'd' was misplaced
+                $amount, 
+                $status, 
+                $reservation_date
+            );
+            if ($stmt->execute()) {
+                $_SESSION['notification_message'] = "New booking added successfully!";
+                $_SESSION['notification_type'] = "success";
+                error_log("PHP: Booking added successfully.");
+            } else {
+                $_SESSION['notification_message'] = "Error adding booking: " . $stmt->error;
+                $_SESSION['notification_type'] = "error";
+                error_log("PHP: Error executing statement: " . $stmt->error);
+            }
+            $stmt->close();
+        } else {
+            $_SESSION['notification_message'] = "Database prepare error: " . $conn->error;
+            $_SESSION['notification_type'] = "error";
+            error_log("PHP: Database prepare error: " . $conn->error);
+        }
+    } else {
+        $_SESSION['notification_message'] = "Error: Missing or invalid required fields for adding booking. Check server logs for details.";
+        $_SESSION['notification_type'] = "error";
+        error_log("PHP: Validation failed for add booking. First Name: " . (empty($first_name) ? 'EMPTY' : $first_name) . ", Room Type: " . (empty($room_type) ? 'EMPTY' : $room_type) . ", Amount: " . ($amount === false ? 'INVALID' : $amount));
+    }
+    header('Location: index.php'); // Redirect to prevent re-submission
+    exit();
+}
+
+// Handle EDIT Booking (unchanged, but included for completeness)
+if (isset($_POST['edit_booking'])) {
+    error_log("PHP: edit_booking POST request received."); // Debugging log
+    $id = filter_var($_POST['modal_booking_id'] ?? 0, FILTER_VALIDATE_INT); 
+    $customer_name_full = $_POST['modal_customer_name'] ?? '';
+    $name_parts = explode(' ', $customer_name_full, 2); 
+    $first_name = $conn->real_escape_string($name_parts[0] ?? '');
+    $last_name = $conn->real_escape_string($name_parts[1] ?? '');
+    $room_type = $conn->real_escape_string($_POST['modal_room_type'] ?? '');
+    $hotel_branch = $conn->real_escape_string($_POST['modal_hotel_branch'] ?? '');
+    $check_in = $conn->real_escape_string($_POST['modal_check_in_date'] ?? '');
+    $check_out = $conn->real_escape_string($_POST['modal_check_out_date'] ?? '');
+    $payment_type = $conn->real_escape_string($_POST['modal_payment_type'] ?? '');
+    $payment_method_detail = $conn->real_escape_string($_POST['modal_payment_method_detail'] ?? '');
+    $account_number = $conn->real_escape_string($_POST['modal_account_number'] ?? '');
+    $account_name = $conn->real_escape_string($_POST['modal_account_name'] ?? '');
+    $amount = filter_var($_POST['modal_amount'] ?? 0, FILTER_VALIDATE_FLOAT);
+    $status = $conn->real_escape_string($_POST['modal_status'] ?? '');
+
+    if ($id > 0 && !empty($first_name) && !empty($room_type) && !empty($hotel_branch) && !empty($check_in) && !empty($check_out) && !empty($payment_type) && $amount !== false && !empty($status)) {
+        $stmt = $conn->prepare("UPDATE booking_db SET first_name = ?, last_name = ?, room_type = ?, hotel_branch = ?, check_in = ?, check_out = ?, payment_type = ?, payment_method_detail = ?, account_number = ?, account_name = ?, amount = ?, status = ? WHERE id = ?");
+        if ($stmt) {
+            $stmt->bind_param("sssssssssdssi", $first_name, $last_name, $room_type, $hotel_branch, $check_in, $check_out, $payment_type, $payment_method_detail, $account_number, $account_name, $amount, $status, $id); 
+            if ($stmt->execute()) {
+                if ($stmt->affected_rows > 0) {
+                    $_SESSION['notification_message'] = "Booking updated successfully!";
+                    $_SESSION['notification_type'] = "success";
+                } else {
+                    $_SESSION['notification_message'] = "No changes made to booking ID " . $id . ".";
+                    $_SESSION['notification_type'] = "info";
+                }
+            } else {
+                $_SESSION['notification_message'] = "Error updating booking: " . $stmt->error;
+                $_SESSION['notification_type'] = "error";
+            }
+            $stmt->close();
+        } else {
+            $_SESSION['notification_message'] = "Database prepare error: " . $conn->error;
+            $_SESSION['notification_type'] = "error";
+        }
+    } else {
+        $_SESSION['notification_message'] = "Error: Missing or invalid required fields for editing booking.";
+        $_SESSION['notification_type'] = "error";
+    }
+    header('Location: index.php'); 
+    exit();
+}
+
+// Handle DELETE Booking (unchanged, but included for completeness)
+if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['db_id'])) { 
+    error_log("PHP: delete_booking GET request received for ID: " . $_GET['db_id']); // Debugging log
+    $id_to_delete = filter_var($_GET['db_id'], FILTER_VALIDATE_INT); 
+
+    if ($id_to_delete > 0) { 
+        $stmt = $conn->prepare("DELETE FROM booking_db WHERE id = ?"); 
+        if ($stmt) {
+            $stmt->bind_param("i", $id_to_delete); 
+            if ($stmt->execute()) {
+                if ($stmt->affected_rows > 0) {
+                    $_SESSION['notification_message'] = "Booking deleted successfully!";
+                    $_SESSION['notification_type'] = "success";
+                } else {
+                    $_SESSION['notification_message'] = "Booking ID " . $id_to_delete . " not found or already deleted.";
+                    $_SESSION['notification_type'] = "info";
+                }
+            } else {
+                $_SESSION['notification_message'] = "Error deleting booking: " . $stmt->error;
+                $_SESSION['notification_type'] = "error";
+            }
+            $stmt->close();
+        } else {
+            $_SESSION['notification_message'] = "Database prepare error: " . $conn->error;
+            $_SESSION['notification_type'] = "error";
+        }
+    } else {
+        $_SESSION['notification_message'] = "Error: Invalid Booking ID provided for deletion.";
+        $_SESSION['notification_type'] = "error";
+    }
+    header('Location: index.php'); 
+    exit();
+}
+
+
+// Fetch booking data from the database (always done after potential modifications)
+$bookings = [];
+$sql = "SELECT
+            id,              -- Fetch the actual integer ID
+            transaction_id,  -- Keep this if you need to display it
+            first_name,
+            last_name,
+            reservation_date,
+            check_in,
+            check_out,
+            room_type,
+            hotel_branch,
+            payment_type,
+            payment_method_detail,
+            account_number,
+            account_name,
+            amount,
+            status
+        FROM booking_db ORDER BY reservation_date DESC"; // Order by most recent
+$result = $conn->query($sql);
+
+if ($result) {
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $bookings[] = [
+                'id' => htmlspecialchars($row['id']), // Use the actual integer ID here
+                'transaction_id' => htmlspecialchars($row['transaction_id']), // Keep this if needed for display
+                'first_name' => htmlspecialchars($row['first_name']),
+                'last_name' => htmlspecialchars($row['last_name']),
+                'customer_name' => htmlspecialchars($row['first_name'] . ' ' . $row['last_name']),
+                'status' => htmlspecialchars($row['status']),
+                'room_type' => htmlspecialchars($row['room_type']),
+                'hotel_branch' => htmlspecialchars($row['hotel_branch']),
+                'check_in' => htmlspecialchars($row['check_in']),
+                'check_out' => htmlspecialchars($row['check_out']),
+                'payment_type' => htmlspecialchars($row['payment_type']),
+                'payment_method_detail' => htmlspecialchars($row['payment_method_detail']),
+                'account_number' => htmlspecialchars($row['account_number']),
+                'account_name' => htmlspecialchars($row['account_name']),
+                'amount' => htmlspecialchars(number_format((float)$row['amount'], 2, '.', '')),
+                'raw_amount' => (float)$row['amount'] // Keep raw float for modal population
+            ];
+        }
+    }
+} else {
+    error_log("PHP: Error fetching bookings: " . $conn->error); // Debugging log
+    // Do not echo directly in production, use session messages or a proper error display
+}
+
+// Close the database connection
+$conn->close();
 
 // Calculate the total number of bookings
 $totalBookedCount = count($bookings);
+
+// Retrieve and clear notification message
+$notification_message = $_SESSION['notification_message'] ?? '';
+$notification_type = $_SESSION['notification_type'] ?? '';
+unset($_SESSION['notification_message']);
+unset($_SESSION['notification_type']);
 ?>
 
 <!DOCTYPE html>
@@ -77,14 +241,11 @@ $totalBookedCount = count($bookings);
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin Dashboard</title>
+    <title>Admin Dashboard - Bookings</title>
     <link rel="stylesheet" href="./assets/css/style.css" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-        }
-    </style>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <div class="container">
@@ -106,7 +267,7 @@ $totalBookedCount = count($bookings);
         <main class="main-content">
             <div class="bookings-header-container">
                 <h2>Total Booked <span class="total-booked-count"><?php echo str_pad($totalBookedCount, 2, '0', STR_PAD_LEFT); ?></span></h2>
-                <span id="addBookingButton" class="add-booking-icon">+</span>
+                <span id="addBookingButton" class="add-booking-icon"><i class="fas fa-plus"></i></span>
             </div>
 
             <div class="bookings-list">
@@ -114,607 +275,366 @@ $totalBookedCount = count($bookings);
                     <p>No bookings found.</p>
                 <?php else: ?>
                     <?php foreach ($bookings as $booking): ?>
-                        <div class="booking-card" data-id="<?php echo htmlspecialchars($booking['id']); ?>">
+                        <div class="booking-card" data-id="<?php echo $booking['id']; ?>">
                             <div class="card-row header-row">
                                 <div class="booking-info-left">
-                                    <span class="customer-name" data-field="customer_name"><?php echo htmlspecialchars($booking['customer_name']); ?></span>
-                                    <span class="status-tag <?php echo htmlspecialchars($booking['status']); ?>" data-field="status">
-                                        <?php echo htmlspecialchars(strtoupper($booking['status'])); ?>
-                                    </span>
+                                    <span class="customer-name" data-field="customer_name"><?php echo $booking['customer_name']; ?></span>
+                                    <span class="status-tag <?php echo $booking['status']; ?>" data-field="status"><?php echo $booking['status']; ?></span>
                                 </div>
                                 <div class="booking-icons">
-                                    <span class="edit-icon" data-id="<?php echo $booking['id']; ?>">&#9998;</span>
-                                    <span class="delete-icon" data-id="<?php echo $booking['id']; ?>">&times;</span>
+                                    <a href="#" class="edit-icon" data-id="<?php echo $booking['id']; ?>"><i class="fas fa-edit"></i></a>
+                                    <a href="?action=delete&db_id=<?php echo $booking['id']; ?>" class="delete-icon" onclick="return confirm('Are you sure you want to delete this booking?');"><i class="fas fa-trash-alt"></i></a>
                                 </div>
                             </div>
                             <div class="card-row details-row">
-                                <p class="room-type" data-field="room_type"><?php echo htmlspecialchars($booking['room_type']); ?></p>
-                                <p class="hotel-branch" data-field="hotel_branch"><?php echo htmlspecialchars($booking['hotel_branch']); ?></p>
-                                <p class="payment-type" data-field="payment_type"><?php echo htmlspecialchars($booking['payment_type']); ?></p>
-                                <span style="display:none;" data-field="check_in"><?php echo htmlspecialchars($booking['check_in']); ?></span>
-                                <span style="display:none;" data-field="check_out"><?php echo htmlspecialchars($booking['check_out']); ?></span>
-                                <span style="display:none;" data-field="payment_method_detail"><?php echo htmlspecialchars($booking['payment_method_detail']); ?></span>
-                                <span style="display:none;" data-field="account_number"><?php echo htmlspecialchars($booking['account_number']); ?></span>
-                                <span style="display:none;" data-field="account_name"><?php echo htmlspecialchars($booking['account_name']); ?></span>
-                                <span style="display:none;" data-field="amount"><?php echo htmlspecialchars($booking['amount']); ?></span>
+                                <p><strong>Transaction ID:</strong> <span data-field="transaction_id"><?php echo $booking['transaction_id']; ?></span></p>
+                                <p><strong>Room Type:</strong> <span data-field="room_type"><?php echo $booking['room_type']; ?></span></p>
+                                <p><strong>Branch:</strong> <span data-field="hotel_branch"><?php echo $booking['hotel_branch']; ?></span></p>
+                                <p><strong>Check-in:</strong> <span data-field="check_in"><?php echo $booking['check_in']; ?></span></p>
+                                <p><strong>Check-out:</strong> <span data-field="check_out"><?php echo $booking['check_out']; ?></span></p>
+                                <p><strong>Payment Type:</strong> <span data-field="payment_type"><?php echo $booking['payment_type']; ?></span></p>
+                                <p><strong>Amount:</strong> <span data-field="amount">₱<?php echo $booking['amount']; ?></span></p>
                             </div>
                         </div>
                     <?php endforeach; ?>
                 <?php endif; ?>
             </div>
         </main>
-
-        <div id="editBookingModal" class="modal">
-            <div class="modal-content">
-                <span class="close-button edit-modal-close">&times;</span> <h2>Edit Booking <span class="edit-icon">&#9998;</span></h2>
-
-                <p id="modalErrorMessage" class="error-message" style="display:none;"></p>
-
-                <form id="editBookingForm" method="POST">
-                    <input type="hidden" id="modal_booking_id" name="booking_id">
-
-                    <div class="form-group">
-                        <label for="modal_customer_name">Customer Name</label>
-                        <input type="text" id="modal_customer_name" name="customer_name" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="modal_room_type">Room Type</label>
-                        <select id="modal_room_type" name="room_type" required>
-                            <option value="Suite Room">Suite Room</option>
-                            <option value="Deluxe Room">Deluxe Room</option>
-                            <option value="Standard Room">Standard Room</option>
-                            <option value="Family Room">Family Room</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="modal_hotel_branch">Hotel Branch</label>
-                        <select id="modal_hotel_branch" name="hotel_branch" required>
-                            <option value="Crown Hotel at Legaspi">Crown Hotel at Legaspi</option>
-                            <option value="Crown Hotel at Cebu">Crown Hotel at Cebu</option>
-                            <option value="Crown Hotel at Davao">Crown Hotel at Davao</option>
-                            <option value="Crown Hotel at Boracay">Crown Hotel at Boracay</option>
-                        </select>
-                    </div>
-
-                    <div class="check-in-out-group">
-                        <div class="form-group">
-                            <label for="modal_check_in_date">Check In Date</label>
-                            <input type="date" id="modal_check_in_date" name="check_in_date" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="modal_check_out_date">Check Out Date</label>
-                            <input type="date" id="modal_check_out_date" name="check_out_date" required>
-                        </div>
-                    </div>
-
-                    <div class="payment-details-group">
-                        <h3>Payment Details</h3>
-                        <div class="form-group">
-                            <label for="modal_payment_type">Payment Type</label>
-                            <select id="modal_payment_type" name="payment_type" required>
-                                <option value="E-Wallet/E-Money Payment">E-Wallet/E-Money Payment</option>
-                                <option value="Credit Card">Credit Card</option>
-                                <option value="Bank Transfer">Bank Transfer</option>
-                                <option value="Cash">Cash</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="modal_payment_method_detail">Payment Method Detail (e.g., GCASH, Visa, BDO)</label>
-                            <input type="text" id="modal_payment_method_detail" name="payment_method_detail">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="modal_account_number">Account Number</label>
-                            <input type="text" id="modal_account_number" name="account_number">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="modal_account_name">Account Name</label>
-                            <input type="text" id="modal_account_name" name="account_name">
-                        </div>
-                    </div>
-
-                    <div class="amount-status-group">
-                        <div class="total-amount-display">
-                            <span class="amount-display">₱ <input type="number" step="0.01" id="modal_amount" name="amount" required style="width: 120px; text-align: right; background-color: transparent; border: none; color: inherit; font-size: inherit; font-weight: inherit;"></span>
-                        </div>
-                        <div class="form-group">
-                            <label for="modal_status">Status</label>
-                            <select id="modal_status" name="status" class="status-select" required>
-                                <option value="paid">PAID</option>
-                                <option value="cancelled">CANCELLED</option>
-                                <option value="pending">PENDING</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="button-group">
-                        <button type="button" class="cancel-button edit-modal-close">Cancel</button>
-                        <button type="submit" class="save-button">Save Changes</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <div id="addBookingModal" class="modal">
-            <div class="modal-content">
-                <span class="close-button add-modal-close">&times;</span> <h2>Add New Booking <span>+</span></h2> <p id="addModalErrorMessage" class="error-message" style="display:none;"></p>
-
-                <form id="addBookingForm" method="POST">
-                    <div class="form-group">
-                        <label for="new_customer_name">Customer Name</label>
-                        <input type="text" id="new_customer_name" name="customer_name" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="new_room_type">Room Type</label>
-                        <select id="new_room_type" name="room_type" required>
-                            <option value="Suite Room">Suite Room</option>
-                            <option value="Deluxe Room">Deluxe Room</option>
-                            <option value="Standard Room">Standard Room</option>
-                            <option value="Family Room">Family Room</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="new_hotel_branch">Hotel Branch</label>
-                        <select id="new_hotel_branch" name="hotel_branch" required>
-                            <option value="Crown Hotel at Legaspi">Crown Hotel at Legaspi</option>
-                            <option value="Crown Hotel at Cebu">Crown Hotel at Cebu</option>
-                            <option value="Crown Hotel at Davao">Crown Hotel at Davao</option>
-                            <option value="Crown Hotel at Boracay">Crown Hotel at Boracay</option>
-                        </select>
-                    </div>
-
-                    <div class="check-in-out-group">
-                        <div class="form-group">
-                            <label for="new_check_in_date">Check In Date</label>
-                            <input type="date" id="new_check_in_date" name="check_in_date" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="new_check_out_date">Check Out Date</label>
-                            <input type="date" id="new_check_out_date" name="check_out_date" required>
-                        </div>
-                    </div>
-
-                    <div class="payment-details-group">
-                        <h3>Payment Details</h3>
-                        <div class="form-group">
-                            <label for="new_payment_type">Payment Type</label>
-                            <select id="new_payment_type" name="payment_type" required>
-                                <option value="E-Wallet/E-Money Payment">E-Wallet/E-Money Payment</option>
-                                <option value="Credit Card">Credit Card</option>
-                                <option value="Bank Transfer">Bank Transfer</option>
-                                <option value="Cash">Cash</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="new_payment_method_detail">Payment Method Detail (e.g., GCASH, Visa, BDO)</label>
-                            <input type="text" id="new_payment_method_detail" name="payment_method_detail">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="new_account_number">Account Number</label>
-                            <input type="text" id="new_account_number" name="account_number">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="new_account_name">Account Name</label>
-                            <input type="text" id="new_account_name" name="account_name">
-                        </div>
-                    </div>
-
-                    <div class="amount-status-group">
-                        <div class="total-amount-display">
-                            <span class="amount-display">₱ <input type="number" step="0.01" id="new_amount" name="amount" required style="width: 120px; text-align: right; background-color: transparent; border: none; color: inherit; font-size: inherit; font-weight: inherit;"></span>
-                        </div>
-                        <div class="form-group">
-                            <label for="new_status">Status</label>
-                            <select id="new_status" name="status" class="status-select" required>
-                                <option value="paid">PAID</option>
-                                <option value="cancelled">CANCELLED</option>
-                                <option value="pending">PENDING</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="button-group">
-                        <button type="button" class="cancel-button add-modal-close">Cancel</button>
-                        <button type="submit" class="save-button">Add Booking</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <div id="notification" class="notification"></div>
     </div>
 
+    <!-- Edit Booking Modal -->
+    <div id="editBookingModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeEditModal()">&times;</span>
+            <h2>Edit Booking <i class="fas fa-edit edit-icon"></i></h2>
+            <form id="editBookingForm" action="index.php" method="POST">
+                <input type="hidden" name="edit_booking" value="1">
+                <input type="hidden" id="modal_booking_id" name="modal_booking_id">
+                <input type="hidden" id="modal_transaction_id" name="modal_transaction_id">
+
+                <div class="form-group">
+                    <label for="modal_customer_name">Customer Name:</label>
+                    <input type="text" id="modal_customer_name" name="modal_customer_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="modal_room_type">Room Type:</label>
+                    <input type="text" id="modal_room_type" name="modal_room_type" required>
+                </div>
+                <div class="form-group">
+                    <label for="modal_hotel_branch">Hotel Branch:</label>
+                    <input type="text" id="modal_hotel_branch" name="modal_hotel_branch" required>
+                </div>
+                <div class="form-group">
+                    <label for="modal_check_in_date">Check-in Date:</label>
+                    <input type="date" id="modal_check_in_date" name="modal_check_in_date" required>
+                </div>
+                <div class="form-group">
+                    <label for="modal_check_out_date">Check-out Date:</label>
+                    <input type="date" id="modal_check_out_date" name="modal_check_out_date" required>
+                </div>
+                <div class="form-group">
+                    <label for="modal_payment_type">Payment Type:</label>
+                    <input type="text" id="modal_payment_type" name="modal_payment_type" required>
+                </div>
+                <div class="form-group">
+                    <label for="modal_payment_method_detail">Payment Method Detail:</label>
+                    <input type="text" id="modal_payment_method_detail" name="modal_payment_method_detail">
+                </div>
+                <div class="form-group">
+                    <label for="modal_account_number">Account Number:</label>
+                    <input type="text" id="modal_account_number" name="modal_account_number">
+                </div>
+                <div class="form-group">
+                    <label for="modal_account_name">Account Name:</label>
+                    <input type="text" id="modal_account_name" name="modal_account_name">
+                </div>
+                <div class="form-group">
+                    <label for="modal_amount">Amount:</label>
+                    <input type="number" id="modal_amount" name="modal_amount" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="modal_status">Status:</label>
+                    <select id="modal_status" name="modal_status" required>
+                        <option value="paid">Paid</option>
+                        <option value="pending">Pending</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div class="button-group">
+                    <button type="submit" class="save-button">Save Changes</button>
+                    <button type="button" class="cancel-button" onclick="closeEditModal()">Cancel</button>
+                </div>
+                <p id="editModalErrorMessage" class="error-message"></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add New Booking Modal -->
+    <div id="addBookingModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeAddModal()">&times;</span>
+            <h2>Add New Booking <span class="add-booking-icon-title"><i class="fas fa-plus"></i></span></h2>
+            <form id="addBookingForm" action="index.php" method="POST">
+                <input type="hidden" name="add_booking" value="1"> <!-- Trigger for PHP -->
+
+                <div class="form-group">
+                    <label for="new_customer_name">Customer Name:</label>
+                    <input type="text" id="new_customer_name" name="new_customer_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="new_room_type">Room Type:</label>
+                    <input type="text" id="new_room_type" name="new_room_type" required>
+                </div>
+                <div class="form-group">
+                    <label for="new_hotel_branch">Hotel Branch:</label>
+                    <input type="text" id="new_hotel_branch" name="new_hotel_branch" required>
+                </div>
+                <div class="form-group">
+                    <label for="new_check_in_date">Check-in Date:</label>
+                    <input type="date" id="new_check_in_date" name="new_check_in_date" required>
+                </div>
+                <div class="form-group">
+                    <label for="new_check_out_date">Check-out Date:</label>
+                    <input type="date" id="new_check_out_date" name="new_check_out_date" required>
+                </div>
+                <div class="form-group">
+                    <label for="new_payment_type">Payment Type:</label>
+                    <input type="text" id="new_payment_type" name="new_payment_type" required>
+                </div>
+                <div class="form-group">
+                    <label for="new_payment_method_detail">Payment Method Detail:</label>
+                    <input type="text" id="new_payment_method_detail" name="new_payment_method_detail">
+                </div>
+                <div class="form-group">
+                    <label for="new_account_number">Account Number:</label>
+                    <input type="text" id="new_account_number" name="new_account_number">
+                </div>
+                <div class="form-group">
+                    <label for="new_account_name">Account Name:</label>
+                    <input type="text" id="new_account_name" name="new_account_name">
+                </div>
+                <div class="form-group">
+                    <label for="new_amount">Amount:</label>
+                    <input type="number" id="new_amount" name="new_amount" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="new_status">Status:</label>
+                    <select id="new_status" name="new_status" required>
+                        <option value="paid">Paid</option>
+                        <option value="pending">Pending</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div class="button-group">
+                    <button type="submit" class="save-button">Add Booking</button>
+                    <button type="button" class="cancel-button" onclick="closeAddModal()">Cancel</button>
+                </div>
+                <p id="addModalErrorMessage" class="error-message"></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification Message -->
+    <?php if (!empty($notification_message)): ?>
+        <div class="notification <?php echo $notification_type; ?>">
+            <?php echo $notification_message; ?>
+        </div>
+    <?php endif; ?>
+
     <script>
-        // PHP to JavaScript: Pass the initial bookings data to JS
-        // This makes the data available for client-side manipulation
-        const allBookingsData = <?php echo json_encode($bookings); ?>;
-        const bookingsById = {};
-        allBookingsData.forEach(booking => {
-            bookingsById[booking.id] = booking;
-        });
+        console.log("JavaScript: Script loaded.");
 
-        // Get elements for Edit Modal
-        const editBookingModal = document.getElementById("editBookingModal");
-        const editModalCloseButtons = document.querySelectorAll(".edit-modal-close"); // Specific class for edit modal close
-        const editBookingForm = document.getElementById("editBookingForm");
-        const editModalErrorMessage = document.getElementById("modalErrorMessage"); // Renamed for clarity
+        // Get the modals
+        var editBookingModal = document.getElementById("editBookingModal");
+        var addBookingModal = document.getElementById("addBookingModal");
 
-        // Get form fields in the Edit Modal
-        const modalBookingId = document.getElementById("modal_booking_id");
-        const modalCustomerName = document.getElementById("modal_customer_name");
-        const modalRoomType = document.getElementById("modal_room_type");
-        const modalHotelBranch = document.getElementById("modal_hotel_branch");
-        const modalCheckInDate = document.getElementById("modal_check_in_date");
-        const modalCheckOutDate = document.getElementById("modal_check_out_date");
-        const modalPaymentType = document.getElementById("modal_payment_type");
-        const modalPaymentMethodDetail = document.getElementById("modal_payment_method_detail");
-        const modalAccountNumber = document.getElementById("modal_account_number");
-        const modalAccountName = document.getElementById("modal_account_name");
-        const modalAmount = document.getElementById("modal_amount");
-        const modalStatus = document.getElementById("modal_status");
+        // Get the buttons that open the modals
+        var addBookingButton = document.getElementById("addBookingButton");
 
-        // Get elements for Add Booking Modal (NEW)
-        const addBookingModal = document.getElementById("addBookingModal");
-        const addModalCloseButtons = document.querySelectorAll(".add-modal-close"); // Specific class for add modal close
-        const addBookingForm = document.getElementById("addBookingForm");
-        const addModalErrorMessage = document.getElementById("addModalErrorMessage");
+        // Get the <span> elements that close the modals
+        var closeButtons = document.getElementsByClassName("close-button");
 
-        // Get form fields in the Add Booking Modal (NEW)
-        const newCustomerName = document.getElementById("new_customer_name");
-        const newRoomType = document.getElementById("new_room_type");
-        const newHotelBranch = document.getElementById("new_hotel_branch");
-        const newCheckInDate = document.getElementById("new_check_in_date");
-        const newCheckOutDate = document.getElementById("new_check_out_date");
-        const newPaymentType = document.getElementById("new_payment_type");
-        const newPaymentMethodDetail = document.getElementById("new_payment_method_detail");
-        const newAccountNumber = document.getElementById("new_account_number");
-        const newAccountName = document.getElementById("new_account_name");
-        const newAmount = document.getElementById("new_amount");
-        const newStatus = document.getElementById("new_status");
-
-        // General elements
-        const addBookingButton = document.getElementById("addBookingButton"); // The main '+' icon
-        const bookingsListContainer = document.querySelector(".bookings-list");
-        const totalBookedCountSpan = document.querySelector(".total-booked-count");
-        const notificationElement = document.getElementById("notification");
-
-        // Function to show notification
-        function showNotification(message, isError = false) {
-            notificationElement.textContent = message;
-            notificationElement.className = 'notification'; // Reset classes
-            if (isError) {
-                notificationElement.classList.add('error');
-            }
-            notificationElement.style.display = 'block';
-            notificationElement.style.opacity = '1';
-
-            setTimeout(() => {
-                notificationElement.style.opacity = '0';
-                setTimeout(() => {
-                    notificationElement.style.display = 'none';
-                }, 500); // Wait for fade out to complete before hiding
-            }, 3000); // Hide after 3 seconds
-        }
-
-        // Function to open the Edit modal and populate data
-        function openEditModal(bookingId) {
-            editModalErrorMessage.style.display = 'none'; // Hide any previous error messages
-
-            const booking = bookingsById[bookingId];
-
-            if (booking) {
-                modalBookingId.value = booking.id;
-                modalCustomerName.value = booking.customer_name;
-                modalRoomType.value = booking.room_type;
-                modalHotelBranch.value = booking.hotel_branch;
-                modalCheckInDate.value = booking.check_in || '';
-                modalCheckOutDate.value = booking.check_out || '';
-                modalPaymentType.value = booking.payment_type;
-                modalPaymentMethodDetail.value = booking.payment_method_detail || '';
-                modalAccountNumber.value = booking.account_number || '';
-                modalAccountName.value = booking.account_name || '';
-                modalAmount.value = parseFloat(booking.amount || 0).toFixed(2);
-                modalStatus.value = booking.status;
-
-                editBookingModal.style.display = "block"; // Show the modal
-            } else {
-                console.error("Booking not found for ID:", bookingId);
-                showNotification("Error: Booking not found.", true);
-            }
-        }
-
-        // Function to close the Edit modal
-        function closeEditModal() {
-            editBookingModal.style.display = "none";
-            editBookingForm.reset(); // Reset form fields
-        }
-
-        // Function to open the Add Booking modal (NEW)
+        // Function to open the Add Booking Modal
         function openAddModal() {
-            addModalErrorMessage.style.display = 'none'; // Hide any previous error messages
-            addBookingForm.reset(); // Clear all fields for a new entry
-            addBookingModal.style.display = "block"; // Show the modal
-            newStatus.value = 'pending'; // Default status for new bookings
+            console.log("JavaScript: Opening Add Modal.");
+            addBookingModal.style.display = "block";
+            document.getElementById("addModalErrorMessage").style.display = "none"; // Hide error on open
+            document.getElementById("addBookingForm").reset(); // Clear form on open
         }
 
-        // Function to close the Add Booking modal (NEW)
+        // Function to close the Add Booking Modal
         function closeAddModal() {
+            console.log("JavaScript: Closing Add Modal.");
             addBookingModal.style.display = "none";
-            addBookingForm.reset(); // Reset form fields
         }
 
-        // Event listener for opening Add Booking modal
-        addBookingButton.addEventListener("click", openAddModal);
+        // Function to open the Edit Booking Modal and populate data
+        function openEditModal(bookingData) {
+            console.log("JavaScript: Opening Edit Modal with data:", bookingData);
+            document.getElementById("modal_booking_id").value = bookingData.id;
+            document.getElementById("modal_transaction_id").value = bookingData.transaction_id;
+            document.getElementById("modal_customer_name").value = bookingData.customer_name;
+            document.getElementById("modal_room_type").value = bookingData.room_type;
+            document.getElementById("modal_hotel_branch").value = bookingData.hotel_branch;
+            document.getElementById("modal_check_in_date").value = bookingData.check_in;
+            document.getElementById("modal_check_out_date").value = bookingData.check_out;
+            document.getElementById("modal_payment_type").value = bookingData.payment_type;
+            document.getElementById("modal_payment_method_detail").value = bookingData.payment_method_detail;
+            document.getElementById("modal_account_number").value = bookingData.account_number;
+            document.getElementById("modal_account_name").value = bookingData.account_name;
+            document.getElementById("modal_amount").value = bookingData.raw_amount; // Use raw_amount for input type number
+            document.getElementById("modal_status").value = bookingData.status;
 
-        // Event listeners for closing modals
-        editModalCloseButtons.forEach(button => {
-            button.addEventListener("click", closeEditModal);
-        });
-        addModalCloseButtons.forEach(button => { // NEW
-            button.addEventListener("click", closeAddModal);
-        });
+            editBookingModal.style.display = "block";
+            document.getElementById("editModalErrorMessage").style.display = "none"; // Hide error on open
+        }
 
-        // Close modal if user clicks outside of it
-        window.addEventListener("click", function(event) {
-            if (event.target == editBookingModal) {
+        // Function to close the Edit Booking Modal
+        function closeEditModal() {
+            console.log("JavaScript: Closing Edit Modal.");
+            editBookingModal.style.display = "none";
+        }
+
+        // When the user clicks the add booking button, open the modal
+        addBookingButton.onclick = function() {
+            console.log("JavaScript: Add Booking button clicked.");
+            openAddModal();
+        }
+
+        // When the user clicks on <span> (x), close the modal
+        for (var i = 0; i < closeButtons.length; i++) {
+            closeButtons[i].onclick = function() {
+                console.log("JavaScript: Close button clicked.");
                 closeEditModal();
-            } else if (event.target == addBookingModal) { // NEW
+                closeAddModal();
+            }
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.addEventListener('click', function(event) {
+            if (event.target == editBookingModal) {
+                console.log("JavaScript: Clicked outside Edit Modal.");
+                closeEditModal();
+            }
+            if (event.target == addBookingModal) {
+                console.log("JavaScript: Clicked outside Add Modal.");
                 closeAddModal();
             }
         });
 
-        // Event Delegation for Edit and Delete icons (REFACTORED)
-        bookingsListContainer.addEventListener("click", function(event) {
-            if (event.target.classList.contains('edit-icon')) {
-                const bookingId = event.target.dataset.id;
-                openEditModal(bookingId);
-            } else if (event.target.classList.contains('delete-icon')) {
-                const bookingId = event.target.dataset.id;
-                if (confirm('Are you sure you want to delete this booking?')) {
-                    // --- SIMULATED CLIENT-SIDE DELETE (for demonstration without backend) ---
-                    if (bookingsById[bookingId]) {
-                        delete bookingsById[bookingId]; // Remove from JS object
-                        event.target.closest('.booking-card').remove(); // Remove from UI
-                        
-                        // Update total count
-                        const currentCount = parseInt(totalBookedCountSpan.textContent);
-                        totalBookedCountSpan.textContent = String(currentCount - 1).padStart(2, '0');
-
-                        showNotification("Booking deleted successfully!");
-                    } else {
-                        showNotification("Error: Booking not found for deletion.", true);
-                    }
-                    // --- END SIMULATED CLIENT-SIDE DELETE ---
-
-                    // --- REAL AJAX Delete (UNCOMMENT AND IMPLEMENT WHEN DATABASE IS READY) ---
-                    /*
-                    fetch(`delete_booking.php?id=${bookingId}`, {
-                        method: 'GET' // Or POST if you prefer
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            event.target.closest('.booking-card').remove();
-                            // Update total count
-                            const currentCount = parseInt(totalBookedCountSpan.textContent);
-                            totalBookedCountSpan.textContent = String(currentCount - 1).padStart(2, '0');
-                            showNotification("Booking deleted successfully!");
-                        } else {
-                            showNotification(data.message || "Failed to delete booking.", true);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        showNotification("An error occurred during deletion.", true);
-                    });
-                    */
-                }
-            }
-        });
-
-
-        // Handle Edit Form submission via AJAX (simulated for now)
-        editBookingForm.addEventListener("submit", function(event) {
-            event.preventDefault(); // Prevent default form submission
-
-            const formData = new FormData(editBookingForm);
-            const updatedBooking = {};
-            for (let [key, value] of formData.entries()) {
-                updatedBooking[key] = value;
-            }
-
-            const bookingId = parseInt(updatedBooking.booking_id);
-
-            // --- SIMULATED CLIENT-SIDE UPDATE (for demonstration without backend) ---
-            if (bookingsById[bookingId]) {
-                Object.assign(bookingsById[bookingId], updatedBooking);
-                updateBookingCardInUI(bookingId, bookingsById[bookingId]);
-                closeEditModal();
-                showNotification("Booking updated successfully!");
-            } else {
-                editModalErrorMessage.textContent = "Error: Booking not found for update.";
-                editModalErrorMessage.style.display = 'block';
-            }
-            // --- END SIMULATED CLIENT-SIDE UPDATE ---
-
-            // --- REAL AJAX Update (UNCOMMENT AND IMPLEMENT WHEN DATABASE IS READY) ---
-            /*
-            fetch('update_booking_ajax.php', { // You'd create this PHP file
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    updateBookingCardInUI(bookingId, data.updatedBookingData || updatedBooking);
-                    closeEditModal();
-                    showNotification("Booking updated successfully!");
-                } else {
-                    editModalErrorMessage.textContent = data.message || "Failed to update booking.";
-                    editModalErrorMessage.style.display = 'block';
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                editModalErrorMessage.textContent = "An error occurred during update.";
-                editModalErrorMessage.style.display = 'block';
-            });
-            */
-        });
-
-        // Handle Add New Booking Form submission (NEW)
-        addBookingForm.addEventListener("submit", function(event) {
-            event.preventDefault(); // Prevent default form submission
-
-            const formData = new FormData(addBookingForm);
-            const newBooking = {};
-            for (let [key, value] of formData.entries()) {
-                newBooking[key] = value;
-            }
-
-            // Generate a new unique ID for the simulated booking
-            // Get the maximum existing ID and add 1, or start at 1 if no bookings
-            const newId = (Object.keys(bookingsById).length > 0) ? Math.max(...Object.keys(bookingsById).map(Number)) + 1 : 1;
-            newBooking.id = newId;
-
-            // --- SIMULATED CLIENT-SIDE ADD (for demonstration without backend) ---
-            bookingsById[newId] = newBooking; // Add to our JS object
-
-            // Create and append the new booking card to the UI
-            const newCardHTML = createBookingCardHTML(newBooking);
-            bookingsListContainer.insertAdjacentHTML('beforeend', newCardHTML);
-
-            // Update total count
-            const currentCount = parseInt(totalBookedCountSpan.textContent);
-            totalBookedCountSpan.textContent = String(currentCount + 1).padStart(2, '0');
-
-            closeAddModal();
-            showNotification("New booking added successfully!");
-            // --- END SIMULATED CLIENT-SIDE ADD ---
-
-            // --- REAL AJAX Add (UNCOMMENT AND IMPLEMENT WHEN DATABASE IS READY) ---
-            /*
-            fetch('create_booking_ajax.php', { // You'd create this PHP file
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Assuming server returns the full new booking data including its actual ID
-                    const createdBooking = data.newBookingData;
-                    bookingsById[createdBooking.id] = createdBooking;
-                    const newCardHTML = createBookingCardHTML(createdBooking);
-                    bookingsListContainer.insertAdjacentHTML('beforeend', newCardHTML);
-
-                    // Update total count
-                    const currentCount = parseInt(totalBookedCountSpan.textContent);
-                    totalBookedCountSpan.textContent = String(currentCount + 1).padStart(2, '0');
-
-                    closeAddModal();
-                    showNotification("New booking added successfully!");
-                } else {
-                    addModalErrorMessage.textContent = data.message || "Failed to add new booking.";
-                    addModalErrorMessage.style.display = 'block';
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                addModalErrorMessage.textContent = "An error occurred during booking creation.";
-                addModalErrorMessage.style.display = 'block';
-            });
-            */
-        });
-
-        // Function to update the booking card elements on the main page
-        function updateBookingCardInUI(id, data) {
-            const cardElement = document.querySelector(`.booking-card[data-id="${id}"]`);
-            if (cardElement) {
-                cardElement.querySelector('[data-field="customer_name"]').textContent = data.customer_name;
+        // Event listeners for edit buttons
+        document.querySelectorAll('.edit-icon').forEach(button => {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default link behavior
+                console.log("JavaScript: Edit icon clicked.");
+                const card = this.closest('.booking-card');
+                const bookingId = card.dataset.id;
                 
-                const statusTag = cardElement.querySelector('[data-field="status"]');
-                statusTag.textContent = data.status.toUpperCase();
-                statusTag.className = `status-tag ${data.status}`; // Update class for color
+                // Get the full booking data from the PHP-encoded JSON
+                const allBookings = <?php echo json_encode($bookings); ?>;
+                const fullBookingData = allBookings.find(b => b.id == bookingId);
 
-                cardElement.querySelector('[data-field="room_type"]').textContent = data.room_type;
-                cardElement.querySelector('[data-field="hotel_branch"]').textContent = data.hotel_branch;
-                cardElement.querySelector('[data-field="payment_type"]').textContent = data.payment_type;
+                if (fullBookingData) {
+                    openEditModal(fullBookingData);
+                } else {
+                    console.error("JavaScript: Full booking data not found for ID:", bookingId);
+                    // Fallback to partial data if full data isn't found (less ideal)
+                    const partialBookingData = {
+                        id: bookingId,
+                        customer_name: card.querySelector('[data-field="customer_name"]').textContent,
+                        transaction_id: card.querySelector('[data-field="transaction_id"]').textContent,
+                        room_type: card.querySelector('[data-field="room_type"]').textContent,
+                        hotel_branch: card.querySelector('[data-field="hotel_branch"]').textContent,
+                        check_in: card.querySelector('[data-field="check_in"]').textContent,
+                        check_out: card.querySelector('[data-field="check_out"]').textContent,
+                        payment_type: card.querySelector('[data-field="payment_type"]').textContent,
+                        amount: card.querySelector('[data-field="amount"]').textContent.replace('₱', ''),
+                        raw_amount: parseFloat(card.querySelector('[data-field="amount"]').textContent.replace('₱', '')),
+                        status: card.querySelector('[data-field="status"]').textContent.toLowerCase(),
+                        payment_method_detail: '', // Placeholder if not in card
+                        account_number: '', // Placeholder if not in card
+                        account_name: '' // Placeholder if not in card
+                    };
+                    openEditModal(partialBookingData);
+                }
+            });
+        });
 
-                // Update hidden fields in the card for consistency, although not visible
-                cardElement.querySelector('[data-field="check_in"]').textContent = data.check_in || '';
-                cardElement.querySelector('[data-field="check_out"]').textContent = data.check_out || '';
-                cardElement.querySelector('[data-field="payment_method_detail"]').textContent = data.payment_method_detail || '';
-                cardElement.querySelector('[data-field="account_number"]').textContent = data.account_number || '';
-                cardElement.querySelector('[data-field="account_name"]').textContent = data.account_name || '';
-                cardElement.querySelector('[data-field="amount"]').textContent = parseFloat(data.amount || 0).toFixed(2);
+        // Client-side validation for Add Booking Form
+        document.getElementById("addBookingForm").addEventListener('submit', function(event) {
+            console.log("JavaScript: Add Booking Form submission attempted.");
+            const errorMessageElement = document.getElementById("addModalErrorMessage");
+            const requiredFields = [
+                "new_customer_name", "new_room_type", "new_hotel_branch",
+                "new_check_in_date", "new_check_out_date", "new_payment_type",
+                "new_amount", "new_status"
+            ];
+            
+            let allFieldsFilled = true;
+            let missingFields = [];
+            for (const fieldId of requiredFields) {
+                const input = document.getElementById(fieldId);
+                if (input.value.trim() === '') {
+                    allFieldsFilled = false;
+                    missingFields.push(input.previousElementSibling ? input.previousElementSibling.textContent.replace(':', '') : fieldId);
+                }
             }
-        }
 
-        // Function to create HTML string for a new booking card (NEW)
-        function createBookingCardHTML(booking) {
-            // Ensure data fields are properly escaped for HTML insertion
-            const customerName = escapeHtml(booking.customer_name);
-            const status = escapeHtml(booking.status);
-            const roomType = escapeHtml(booking.room_type);
-            const hotelBranch = escapeHtml(booking.hotel_branch);
-            const paymentType = escapeHtml(booking.payment_type);
-            const checkIn = escapeHtml(booking.check_in || '');
-            const checkOut = escapeHtml(booking.check_out || '');
-            const paymentMethodDetail = escapeHtml(booking.payment_method_detail || '');
-            const accountNumber = escapeHtml(booking.account_number || '');
-            const accountName = escapeHtml(booking.account_name || '');
-            const amount = parseFloat(booking.amount || 0).toFixed(2);
+            if (!allFieldsFilled) {
+                event.preventDefault(); // Stop form submission
+                errorMessageElement.textContent = "Please fill in all required fields: " + missingFields.join(', ') + ".";
+                errorMessageElement.style.display = "block";
+                console.warn("JavaScript: Add Form validation failed. Missing fields:", missingFields);
+            } else {
+                errorMessageElement.style.display = "none";
+                console.log("JavaScript: Add Form validation passed. Submitting form.");
+            }
+        });
 
-            return `
-                <div class="booking-card" data-id="${booking.id}">
-                    <div class="card-row header-row">
-                        <div class="booking-info-left">
-                            <span class="customer-name" data-field="customer_name">${customerName}</span>
-                            <span class="status-tag ${status}" data-field="status">
-                                ${status.toUpperCase()}
-                            </span>
-                        </div>
-                        <div class="booking-icons">
-                            <span class="edit-icon" data-id="${booking.id}">&#9998;</span>
-                            <span class="delete-icon" data-id="${booking.id}">&times;</span>
-                        </div>
-                    </div>
-                    <div class="card-row details-row">
-                        <p class="room-type" data-field="room_type">${roomType}</p>
-                        <p class="hotel-branch" data-field="hotel_branch">${hotelBranch}</p>
-                        <p class="payment-type" data-field="payment_type">${paymentType}</p>
-                        <span style="display:none;" data-field="check_in">${checkIn}</span>
-                        <span style="display:none;" data-field="check_out">${checkOut}</span>
-                        <span style="display:none;" data-field="payment_method_detail">${paymentMethodDetail}</span>
-                        <span style="display:none;" data-field="account_number">${accountNumber}</span>
-                        <span style="display:none;" data-field="account_name">${accountName}</span>
-                        <span style="display:none;" data-field="amount">${amount}</span>
-                    </div>
-                </div>
-            `;
-        }
+        // Client-side validation for Edit Booking Form
+        document.getElementById("editBookingForm").addEventListener('submit', function(event) {
+            console.log("JavaScript: Edit Booking Form submission attempted.");
+            const errorMessageElement = document.getElementById("editModalErrorMessage");
+            const requiredFields = [
+                "modal_customer_name", "modal_room_type", "modal_hotel_branch",
+                "modal_check_in_date", "modal_check_out_date", "modal_payment_type",
+                "modal_amount", "modal_status"
+            ];
+            
+            let allFieldsFilled = true;
+            let missingFields = [];
+            for (const fieldId of requiredFields) {
+                const input = document.getElementById(fieldId);
+                if (input.value.trim() === '') {
+                    allFieldsFilled = false;
+                    missingFields.push(input.previousElementSibling ? input.previousElementSibling.textContent.replace(':', '') : fieldId);
+                }
+            }
 
-        // Helper function to escape HTML for dynamically created content
-        function escapeHtml(text) {
-            const map = {
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#039;'
-            };
-            // Ensure text is treated as a string before replacing
-            return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
-        }
+            if (!allFieldsFilled) {
+                event.preventDefault(); // Stop form submission
+                errorMessageElement.textContent = "Please fill in all required fields: " + missingFields.join(', ') + ".";
+                errorMessageElement.style.display = "block";
+                console.warn("JavaScript: Edit Form validation failed. Missing fields:", missingFields);
+            } else {
+                errorMessageElement.style.display = "none";
+                console.log("JavaScript: Edit Form validation passed. Submitting form.");
+            }
+        });
+
+        // Notification display logic
+        window.onload = function() {
+            console.log("JavaScript: Window loaded.");
+            const notification = document.querySelector('.notification');
+            if (notification) {
+                notification.style.display = 'block';
+                console.log("JavaScript: Notification displayed.");
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                    console.log("JavaScript: Notification hidden.");
+                }, 5000); // Hide after 5 seconds
+            }
+        };
     </script>
 </body>
 </html>
