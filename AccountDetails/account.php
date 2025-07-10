@@ -67,7 +67,7 @@ $user = $result->fetch_assoc();
     <nav class="nav-links">
       <a href="../user_hotel_list/index.html" class="btn booking" style="color: #0a2240;">Booking</a>
       <a href="../user_landing_page/index.php" class="btn home">Home</a>
-      <a href="" class="btn home">Account</a>
+      <a href="../LoginPage/index.php" class="btn home">Log Out</a>
     </nav>
   </header>
 
