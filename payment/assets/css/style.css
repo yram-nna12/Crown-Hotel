@@ -11,70 +11,73 @@ body {
 }
 
 /* NAVIGATION BAR */
+/* Top Navigation Bar */
 .topbar {
-  background-color: #112752;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem 3rem;
-  position: sticky;
-  top: 0;
-  z-index: 999;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    background-color: #0a2240; /* Dark navy blue */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 3rem;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Logo Section */
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.5rem;
+    color: #fff;
+    font-weight: 600;
 }
 
 .logo img {
-  height: 90px;
+    height: 100px;
 }
 
+/* Navigation Links */
 .nav-links {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-  padding-right: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding-right: 1rem;
 }
 
+/* Link Styles */
 .nav-links a {
-  text-decoration: none;
-  color: #fff;
-  font-weight: 500;
+    text-decoration: none;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
 }
 
-.btn {
-  padding: 0.7rem 1.8rem;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 0.9rem;
+/* Booking Button */
+.booking {
+    background-color: #ffffff;
+    color: #d9a441; /* Gold text */
+    padding: 0.5rem 1.5rem;
+    font-weight: 600;
 }
-
-.login {
-  background: #fff;
-  color: #0a2240;
-}
-
-.signup {
-  background: #d9a441;
-  color: #fff;
-}
-
 /* MAIN PAYMENT SECTION */
 .payment {
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
-  padding: 40px 60px;
   gap: 40px;
 }
 
 .left-panel {
   width: 60%;
-  padding-right: 20px;
+  padding: 40px 60px;
 }
 
 .right-panel {
   width: 35%;
+  padding: 40px 60px;
 }
 
 .booking-title {
@@ -352,6 +355,7 @@ form input {
   background-color: #0c1e4a;
   color: white;
   padding: 40px 60px;
+  width: 100%;
 }
 
 .footer-content {

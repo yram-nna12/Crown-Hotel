@@ -27,13 +27,12 @@ $full_name = trim($first_name . ' ' . $last_name);
 <body>
   <header class="topbar">
     <div class="logo">
-      <img src="./assets/img/LOGO.png" alt="Crown Tower Logo">
+      <img src="../assets/img/LOGO.png" alt="Crown Tower Logo">
     </div>
     <nav class="nav-links">
-      <a href="../index.php">Home</a>
-      <a href="../AboutUs/index.php">About Us</a>
-      <a href="../LoginPage/index.php" class="btn login" style="color: #0a2240;">Log in</a>
-      <a href="../Signup_page/index.php" class="btn signup">Sign up</a>
+      <a href="../user_hotel_list/index.html" class="btn booking" style="color: #0a2240;">Booking</a>
+      <a href="./index.php" class="btn home" style="color: #d9a441">Home</a>
+      <a href="../AccountDetails/account.php" class="btn home" style="color: #d9a441">Account</a>
     </nav>
   </header>
 
