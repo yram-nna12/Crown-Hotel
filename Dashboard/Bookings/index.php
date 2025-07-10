@@ -1,17 +1,10 @@
 <?php
-// booking/index.php
 
-// --- DEBUGGING: Enable full error reporting for development ---
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-// -----------------------------------------------------------
 
-// Include your database connection file
-require_once '../../config.php'; // Corrected path based on previous error resolution
+require_once '../../config.php'; 
 
-// --- Database Operations (Handle POST/GET requests first) ---
-
-// Start session to store notification messages and ensure it's at the very top
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
@@ -47,10 +40,7 @@ if (isset($_POST['add_booking'])) {
     if (!empty($first_name) && !empty($room_type) && !empty($hotel_branch) && !empty($check_in) && !empty($check_out) && !empty($payment_type) && $amount !== false && !empty($status)) {
         $stmt = $conn->prepare("INSERT INTO booking_db (transaction_id, first_name, last_name, room_type, hotel_branch, check_in, check_out, payment_type, payment_method_detail, account_number, account_name, amount, status, reservation_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         if ($stmt) {
-            // FIX: Corrected the type definition string to match the 14 variables
-            // s: transaction_id, s: first_name, s: last_name, s: room_type, s: hotel_branch,
-            // s: check_in, s: check_out, s: payment_type, s: payment_method_detail, s: account_number,
-            // s: account_name, d: amount, s: status, s: reservation_date
+           
             $stmt->bind_param("sssssssssssdss", 
                 $transaction_id, 
                 $first_name, 

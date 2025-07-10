@@ -1,6 +1,11 @@
 <?php
-// Include your existing database connection file
-include_once '../config.php'; // <--- Make sure this path is correct relative to your index.php
+
+include_once '../config.php'; 
+
+
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+// -----------------------------------------------------------
 
 // --- Fetch Total Users ---
 $totalUsers = 0;
@@ -9,12 +14,41 @@ $resultTotalUsers = $conn->query($sqlTotalUsers);
 if ($resultTotalUsers && $resultTotalUsers->num_rows > 0) {
     $rowTotalUsers = $resultTotalUsers->fetch_assoc();
     $totalUsers = $rowTotalUsers['total_users'];
+} else {
+    error_log("PHP: Error fetching total users: " . $conn->error);
+}
+
+// --- Fetch Total Bookings ---
+$totalBookings = 0;
+$sqlTotalBookings = "SELECT COUNT(*) AS total_bookings FROM booking_db";
+$resultTotalBookings = $conn->query($sqlTotalBookings);
+if ($resultTotalBookings) {
+    if ($resultTotalBookings->num_rows > 0) {
+        $rowTotalBookings = $resultTotalBookings->fetch_assoc();
+        $totalBookings = $rowTotalBookings['total_bookings'];
+    }
+} else {
+    error_log("PHP: Error fetching total bookings: " . $conn->error);
+}
+
+$totalEarnings = 0.00;
+
+$sqlTotalEarnings = "SELECT SUM(amount) AS total_earnings FROM booking_db WHERE status = 'paid'";
+$resultTotalEarnings = $conn->query($sqlTotalEarnings);
+if ($resultTotalEarnings) {
+    if ($resultTotalEarnings->num_rows > 0) {
+        $rowTotalEarnings = $resultTotalEarnings->fetch_assoc();
+        // Ensure that if SUM returns NULL (no paid bookings), it defaults to 0
+        $totalEarnings = $rowTotalEarnings['total_earnings'] ?? 0.00; 
+    }
+} else {
+    error_log("PHP: Error fetching total earnings: " . $conn->error);
 }
 
 // --- Get Today's Date ---
 $todayDate = date("F j, Y"); // e.g., "July 10, 2025"
 
-// IMPORTANT: Close the database connection after fetching all necessary data
+
 $conn->close();
 ?>
 
@@ -54,10 +88,10 @@ $conn->close();
 
             <div class="stats">
                 <div class="card gold">
-                    N/A<br><span>Total Bookings</span>
+                    <?php echo $totalBookings; ?><br><span>Total Bookings</span>
                 </div>
                 <div class="card blue">
-                    N/A<br><span>Total Earnings</span>
+                    ₱<?php echo number_format($totalEarnings, 2); ?><br><span>Total Earnings</span>
                 </div>
                 <div class="card gold">
                     <?php echo $totalUsers; ?><br><span>Total Users</span>
