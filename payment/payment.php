@@ -31,7 +31,7 @@ $full_name = trim($first_name . ' ' . $last_name);
     </div>
     <nav class="nav-links">
       <a href="../user_hotel_list/index.html" class="btn booking" style="color: #0a2240;">Booking</a>
-      <a href="./index.php" class="btn home" style="color: #d9a441">Home</a>
+      <a href="../user_landing_page/index.php" class="btn home" style="color: #d9a441">Home</a>
       <a href="../AccountDetails/account.php" class="btn home" style="color: #d9a441">Account</a>
     </nav>
   </header>
