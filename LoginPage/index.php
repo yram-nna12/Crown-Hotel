@@ -43,6 +43,7 @@ unset($_SESSION['login_error']);
         </div>
 
         <button type="submit" class="login-btn">Log In</button>
+        <a class="login-btn" href="../Signup_page">Sign Up</a>
 
         <div class="divider">Or Log In With</div>
         <div class="social-icons">
