@@ -2,11 +2,28 @@
 session_start();
 require_once '../config.php';
 
-// Process Payment BEFORE HTML renders
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  $transaction_id = $_SESSION['transaction_id'] ?? null;
-  $total_price = $_SESSION['total_price'] ?? 0;
+// Always load session data for display and use
+$transaction_id = $_SESSION['transaction_id'] ?? 'Unavailable';
+$full_name = ($_SESSION['first_name'] ?? '') . ' ' . ($_SESSION['last_name'] ?? '');
+$email = $_SESSION['email'] ?? 'Not set';
+$contact = $_SESSION['contact'] ?? 'Not set';
+$check_in = $_SESSION['check_in'] ?? 'Not set';
+$check_out = $_SESSION['check_out'] ?? 'Not set';
+$room_type = $_SESSION['room_type'] ?? 'Not set';
+$total_price = $_SESSION['total_price'] ?? 0;
+$hotel_name = $_SESSION['hotel_branch'] ?? 'Unknown Hotel';
 
+$locations = [
+  'Crown Hotel at Legaspi' => 'Pasay City, Metro Manila',
+  'Crown Hotel at Westside City Tambo' => 'Paranãque, Metro Manila',
+  'Crown Hotel at General Espino' => 'Taguig, Metro Manila',
+  'Crown Hotel at San Roque' => 'San Roque, Antipolo',
+  'Crown Hotel at Tatlong Hari' => 'Tatlong Hari, Laguna'
+];
+$location = $locations[$hotel_name] ?? 'Unknown Location';
+
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if (!$transaction_id || !$total_price) {
     echo "<script>alert('Session expired or incomplete data. Please restart the booking process.'); window.location.href = '../user_landing_page/index.php';</script>";
     exit;
@@ -16,11 +33,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if (isset($_POST['ewallet_submit'])) {
     $number = $_POST['ewallet_number'] ?? '';
     $name = $_POST['ewallet_name'] ?? '';
-    $method = 'E-Wallet';
+    $method_name = $_POST['ewallet_method'] ?? 'Unknown';
 
     if (preg_match('/^\d{11}$/', $number) && preg_match('/^[a-zA-Z\s]+$/', $name)) {
       $stmt = $conn->prepare("UPDATE booking_db SET 
-        payment_type = 'E-WALLET', 
+        payment_type = ?, 
         payment_method_detail = ?, 
         account_number = ?, 
         account_name = ?, 
@@ -28,7 +45,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         status = 'paid', 
         payment_status = 'paid' 
         WHERE transaction_id = ?");
-      $stmt->bind_param("sssds", $method, $number, $name, $total_price, $transaction_id);
+      $payment_type = $method_name; 
+      $method_detail = 'E-WALLET';
+      $stmt->bind_param("ssssds", $payment_type, $method_detail, $number, $name, $total_price, $transaction_id);
       $stmt->execute();
       $stmt->close();
 
@@ -45,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $expiry = $_POST['expiry'] ?? '';
     $cvv = $_POST['cvv'] ?? '';
     $name = $_POST['card_name'] ?? '';
-    $method = 'Credit/Debit Card';
+    $method_name = $_POST['card_method'] ?? 'Unknown';
 
     if (
       preg_match('/^\d{16}$/', $number) &&
@@ -54,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       preg_match('/^[a-zA-Z\s]+$/', $name)
     ) {
       $stmt = $conn->prepare("UPDATE booking_db SET 
-        payment_type = 'CARD', 
+        payment_type = ?, 
         payment_method_detail = ?, 
         account_number = ?, 
         account_name = ?, 
@@ -62,7 +81,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         status = 'paid', 
         payment_status = 'paid' 
         WHERE transaction_id = ?");
-      $stmt->bind_param("sssds", $method, $number, $name, $total_price, $transaction_id);
+      $payment_type = $method_name; // e.g., 'BDO'
+      $method_detail = 'CARD';
+      $stmt->bind_param("ssssds", $payment_type, $method_detail, $number, $name, $total_price, $transaction_id);
       $stmt->execute();
       $stmt->close();
 
@@ -73,30 +94,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
   }
 }
-
-// GET Session values
-$email = $_SESSION['email'] ?? '';
-$first_name = $_SESSION['first_name'] ?? '';
-$last_name = $_SESSION['last_name'] ?? '';
-$contact = $_SESSION['contact'] ?? '';
-$check_in = $_SESSION['check_in'] ?? '';
-$check_out = $_SESSION['check_out'] ?? '';
-$room_type = $_SESSION['room_type'] ?? 'Standard Room';
-$room_price = $_SESSION['room_price'] ?? 1200;
-$total_price = $_SESSION['total_price'] ?? $room_price;
-$full_name = trim($first_name . ' ' . $last_name);
-$hotel_name = $_SESSION['hotel_name'] ?? 'Crown Hotel at Legaspi';
-
-$locations = [
-  'Crown Hotel at Legaspi' => 'Pasay City, Metro Manila',
-  'Crown Hotel at Westside City Tambo' => 'Parañaque, Metro Manila',
-  'Crown Hotel at General Espino' => 'Taguig, Metro Manila',
-  'Crown Hotel at San Roque' => 'San Roque, Antipolo',
-  'Crown Hotel at Tatlong Hari' => 'Tatlong Hari, Laguna'
-];
-$location = $locations[$hotel_name] ?? 'Unknown Location';
-$transaction_id = $_SESSION['transaction_id'] ?? 'Unavailable';
 ?>
+<!-- Place your HTML code below this PHP block as-is, since the PHP variables are now defined above -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -129,16 +129,16 @@ $transaction_id = $_SESSION['transaction_id'] ?? 'Unavailable';
 
         <p class="method-label">E-Wallet / E-Money</p>
         <div class="payment-buttons">
-          <button class="gcash" onclick="selectPayment('ewallet')">Gcash</button>
-          <button class="paymaya" onclick="selectPayment('ewallet')">Paymaya</button>
-          <button class="gotyme" onclick="selectPayment('ewallet')">GoTyme</button>
-        </div>
+        <button class="gcash" onclick="selectPayment('ewallet', 'Gcash')">Gcash</button>
+        <button class="paymaya" onclick="selectPayment('ewallet', 'Paymaya')">Paymaya</button>
+        <button class="gotyme" onclick="selectPayment('ewallet', 'GoTyme')">GoTyme</button>
+                </div>
 
         <p class="method-label">Credit / Debit Card</p>
         <div class="payment-buttons">
-          <button class="bdo" onclick="selectPayment('card')">BDO</button>
-          <button class="bpi" onclick="selectPayment('card')">BPI</button>
-          <button class="metrobank" onclick="selectPayment('card')">Metrobank</button>
+        <button class="bdo" onclick="selectPayment('card', 'BDO')">BDO</button>
+<button class="bpi" onclick="selectPayment('card', 'BPI')">BPI</button>
+<button class="metrobank" onclick="selectPayment('card', 'Metrobank')">Metrobank</button>
         </div>
       </div>
     </div>
@@ -191,63 +191,83 @@ $transaction_id = $_SESSION['transaction_id'] ?? 'Unavailable';
   </div>
 
   <!-- HIDDEN FORMS -->
+  <!-- HIDDEN FORMS -->
   <form id="ewallet-form" method="POST" style="display:none;">
     <input type="hidden" name="ewallet_submit" value="1" />
     <input type="hidden" name="ewallet_number" id="hidden_ewallet_number" />
     <input type="hidden" name="ewallet_name" id="hidden_ewallet_name" />
+    <input type="hidden" name="ewallet_method" id="hidden_ewallet_method" />
   </form>
-
+  
   <form id="card-form" method="POST" style="display:none;">
     <input type="hidden" name="card_submit" value="1" />
     <input type="hidden" name="card_number" id="hidden_card_number" />
     <input type="hidden" name="expiry" id="hidden_expiry" />
     <input type="hidden" name="cvv" id="hidden_cvv" />
     <input type="hidden" name="card_name" id="hidden_card_name" />
+    <input type="hidden" name="card_method" id="hidden_card_method" />
   </form>
-
+  
   <script>
-    let selectedPayment = "";
+  let selectedPayment = "";
+  let selectedMethod = ""; // GCash, BDO, etc.
 
-    function selectPayment(type) {
-      selectedPayment = type;
-      openPopup(type === 'ewallet' ? 'payment-popup' : 'card-popup');
-    }
+  function selectPayment(type, methodName) {
+  selectedPayment = type;
+  selectedMethod = methodName;
 
-    function openPopup(id) {
-      document.getElementById(id).classList.add("active");
-    }
+  if (type === 'ewallet') {
+    document.getElementById("hidden_ewallet_method").value = selectedMethod;
+    openPopup('payment-popup');
+  } else {
+    document.getElementById("hidden_card_method").value = selectedMethod;
+    openPopup('card-popup');
+  }
+}
 
-    function closePopup(id) {
-      document.getElementById(id).classList.remove("active");
-    }
 
-    function finalizePayment() {
-      if (selectedPayment === "ewallet") {
-        const number = document.getElementById("ewallet_number").value.trim();
-        const name = document.getElementById("ewallet_name").value.trim();
-        if (!/^\d{11}$/.test(number)) return alert("E-Wallet number must be exactly 11 digits.");
-        if (!/^[a-zA-Z\s]+$/.test(name)) return alert("Full name must contain letters only.");
-        document.getElementById("hidden_ewallet_number").value = number;
-        document.getElementById("hidden_ewallet_name").value = name;
-        document.getElementById("ewallet-form").submit();
-      } else if (selectedPayment === "card") {
-        const number = document.getElementById("card_number").value.trim();
-        const expiry = document.getElementById("expiry").value.trim();
-        const cvv = document.getElementById("cvv").value.trim();
-        const name = document.getElementById("card_name").value.trim();
-        if (!/^\d{16}$/.test(number)) return alert("Card number must be exactly 16 digits.");
-        if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiry)) return alert("Expiry must be in MM/YY format.");
-        if (!/^\d{3}$/.test(cvv)) return alert("CVV must be 3 digits.");
-        if (!/^[a-zA-Z\s]+$/.test(name)) return alert("Full name must contain letters only.");
-        document.getElementById("hidden_card_number").value = number;
-        document.getElementById("hidden_expiry").value = expiry;
-        document.getElementById("hidden_cvv").value = cvv;
-        document.getElementById("hidden_card_name").value = name;
-        document.getElementById("card-form").submit();
-      } else {
-        alert("Please select a payment method first.");
-      }
+  function openPopup(id) {
+    document.getElementById(id).classList.add("active");
+  }
+
+  function closePopup(id) {
+    document.getElementById(id).classList.remove("active");
+  }
+
+  function finalizePayment() {
+    if (selectedPayment === "ewallet") {
+      const number = document.getElementById("ewallet_number").value.trim();
+      const name = document.getElementById("ewallet_name").value.trim();
+      if (!/^\d{11}$/.test(number)) return alert("E-Wallet number must be exactly 11 digits.");
+      if (!/^[a-zA-Z\s]+$/.test(name)) return alert("Full name must contain letters only.");
+
+      document.getElementById("hidden_ewallet_number").value = number;
+      document.getElementById("hidden_ewallet_name").value = name;
+
+      document.getElementById("ewallet-form").submit();
+
+    } else if (selectedPayment === "card") {
+      const number = document.getElementById("card_number").value.trim();
+      const expiry = document.getElementById("expiry").value.trim();
+      const cvv = document.getElementById("cvv").value.trim();
+      const name = document.getElementById("card_name").value.trim();
+
+      if (!/^\d{16}$/.test(number)) return alert("Card number must be exactly 16 digits.");
+      if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiry)) return alert("Expiry must be in MM/YY format.");
+      if (!/^\d{3}$/.test(cvv)) return alert("CVV must be 3 digits.");
+      if (!/^[a-zA-Z\s]+$/.test(name)) return alert("Full name must contain letters only.");
+
+      document.getElementById("hidden_card_number").value = number;
+      document.getElementById("hidden_expiry").value = expiry;
+      document.getElementById("hidden_cvv").value = cvv;
+      document.getElementById("hidden_card_name").value = name;
+
+      document.getElementById("card-form").submit();
+    } else {
+      alert("Please select a payment method first.");
     }
-  </script>
+  }
+</script>
+
 </body>
 </html>
