@@ -125,7 +125,7 @@ $transaction_id = $_SESSION['transaction_id'] ?? 'Unavailable';
     <div class="left-panel">
       <div class="payment-method-container">
         <h3>Payment Method</h3>
-        <h5 class="cancellation-policy">Cancellations are subject to a penalty...</h5>
+        <h5 class="cancellation-policy">Cancellations are subject to a penalty: 20% of the room rate if cancelled within 2 days of check-in, 15% if cancelled 4 days prior, and 10% if cancelled 5 days or more in advance (based on 24-hour format).</h5>
 
         <p class="method-label">E-Wallet / E-Money</p>
         <div class="payment-buttons">
