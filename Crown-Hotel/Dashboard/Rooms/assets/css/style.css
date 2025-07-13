@@ -1,0 +1,159 @@
+/* style.css */
+
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background-color: #f8f9fc;
+}
+
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+
+.logo {
+  margin-bottom: 40px;
+}
+
+.logo-img {
+  width: 80%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.menu {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.menu a {
+  display: block;
+  width: 100%;
+  padding: 15px 0;
+  text-align: center;
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.menu a:hover,
+.menu a.active {
+  background-color: #c3a559;
+  color: white;
+}
+
+.profile {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.profile img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 220px;
+    background-color: #122142;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    position: fixed; /* Added this line */
+    height: 100vh; /* Added this line to ensure it takes full viewport height */
+    top: 0; /* Added this line to position it at the top */
+    left: 0; /* Added this line to position it at the left */
+}
+
+.main-content {
+    flex-grow: 1;
+    padding: 40px;
+    background-color: #f8f9fc;
+    margin-left: 220px; /* Added this line - should match sidebar width */
+}
+
+.date-section {
+    margin-bottom: 30px;
+}
+
+.date-section h2 {
+    color: #122142;
+    font-size: 2em;
+    margin-bottom: 5px;
+}
+
+.date-section p {
+    color: #666;
+    font-size: 1.2em;
+}
+
+.rooms-section {
+    margin-bottom: 40px;
+}
+
+.rooms-section h3 {
+    color: #122142;
+    font-size: 1.8em;
+    margin-bottom: 20px;
+}
+
+.room-table {
+    background-color: #fff; /* White background for the table body */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden; /* Ensures border-radius applies to children rows */
+}
+
+.room-table-header {
+    background-color: #122142; 
+    color: white;
+    padding: 15px 25px;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.room-table-header span.branch-label {
+    flex-grow: 1; /* Allows the "BRANCH" text to take available space */
+}
+
+.room-table-header .arrow-icon {
+    margin-left: 10px;
+    font-size: 0.8em; /* Smaller arrow */
+}
+
+.room-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 25px;
+    border-bottom: 1px solid #eee; /* Light gray border between rows */
+    color: #333; /* Darker text color for room details */
+}
+
+.room-row:last-child {
+    border-bottom: none; /* No border for the last row in a table */
+}
+
+.room-row:nth-child(even) {
+    background-color: #e6e9ef; /* Lighter shade for even rows, matching the image */
+}
+
+.room-type {
+    flex-grow: 1; /* Allows room type to take available space */
+}
+
+.room-count {
+    font-weight: 600;
+    width: 30px; /* Give a fixed width to align '00' */
+    text-align: right; /* Align numbers to the right */
+}

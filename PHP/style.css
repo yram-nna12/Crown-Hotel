@@ -1,0 +1,156 @@
+
+body {
+    background-color: #ffffff;
+    margin: 0;
+    font-family: system-ui, sans-serif;
+    display: flex;
+    padding-top: 5rem;
+  }
+
+  header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #b9f0f5;
+    padding: 1.5rem 0;
+    text-align: center;
+    z-index: 9999;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  header h1 {
+    color: #000000;
+    font-weight: 800;
+    font-size: 1.875rem; /* 3xl */
+    margin: 0;
+  }
+  
+  
+  /* Fixed position form on the left center */
+  .fixed-form {
+    position: fixed;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    background-color: #f0ebe9;
+    border-radius: 1rem;
+    padding: 5rem;
+    width: 30rem;
+    height: 15rem;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    margin-left: 20rem;
+  }
+
+  
+  /* The results area should be on the right, scrollable if long */
+  .results-wrapper {
+    margin-left: 70rem; /* Leave space for the fixed form */
+    padding: 2rem;
+    flex: 1;
+    overflow-y: auto;
+  }
+  
+  section.result {
+    background-color: #f0ebe9;
+    border-radius: 1rem;
+    padding: 2rem;
+    max-width: 50rem;
+    width: 100%;
+  }
+  
+  /* Color-coded result types */
+  .log {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .termination {
+    background-color: #f9c7c7;
+    border-left: 4px solid #d20a0a;
+    color: #d20a0a;
+  }
+  
+  .vvip {
+    background-color: #a6d7cc;
+    border-left: 4px solid #007a56;
+    color: #007a56;
+  }
+  
+  .regular {
+    background-color: #c6c9f7;
+    border-left: 4px solid #5a4db3;
+    color: #5a4db3;
+  }
+  
+  .vip {
+    background-color: #a9e1f3;
+    border-left: 4px solid #0a9acb;
+    color: #0a9acb;
+  }
+  
+  .general {
+    background-color: #e6e6e6;
+    border-left: 4px solid #7a7a7a;
+    color: #7a7a7a;
+  }
+  
+  label {
+    display: block;
+    font-size: 15px;
+    color: #000000;
+    margin-bottom: 0.75rem;
+  }
+  
+  input[type="number"] {
+    width: 100%;
+    border-radius: 9999px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    color: #000000;
+    border: none;
+    outline: none;
+    box-sizing: border-box;
+  }
+  
+  button {
+    margin-top: 3rem;
+    width: 100%;
+    background-color: #008c6a;
+    color: #000000;
+    font-weight: 800;
+    font-size: 1rem;
+    border-radius: 9999px;
+    padding: 0.75rem 0;
+    cursor: pointer;
+    transition: filter 0.2s ease-in-out;
+    border: none;
+  }
+  
+  button:hover {
+    filter: brightness(1.1);
+  }
+  @media (max-width: 1024px) {
+    .fixed-form {
+      position: static;
+      transform: none;
+      margin: 2rem auto;
+      width: 90%;
+      max-width: 30rem;
+      height: auto;
+      padding: 2rem;
+    }
+  
+    .results-wrapper {
+      margin-left: 10rem;
+      padding: 1rem;
+      width: 100%;
+    }
+  
+    body {
+      flex-direction: column;
+      padding-top: 8rem;
+    }
+  }
