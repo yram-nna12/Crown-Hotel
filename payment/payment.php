@@ -1,7 +1,39 @@
 <?php
 session_start();
+require_once '../config.php';
+// Handle form submission BEFORE any output
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  if (isset($_POST['ewallet_submit'])) {
+    $number = $_POST['ewallet_number'] ?? '';
+    $name = $_POST['ewallet_name'] ?? '';
+    if (preg_match('/^\d{11}$/', $number) && preg_match('/^[a-zA-Z\s]+$/', $name)) {
+      header("Location: ../user_landing_page/index.php");
+      exit();
+    } else {
+      echo "<script>alert('Invalid E-Wallet details');</script>";
+    }
+  }
 
-// Retrieve session data
+  if (isset($_POST['card_submit'])) {
+    $number = $_POST['card_number'] ?? '';
+    $expiry = $_POST['expiry'] ?? '';
+    $cvv = $_POST['cvv'] ?? '';
+    $name = $_POST['card_name'] ?? '';
+    if (
+      preg_match('/^\d{16}$/', $number) &&
+      preg_match('/^(0[1-9]|1[0-2])\/\d{2}$/', $expiry) &&
+      preg_match('/^\d{3}$/', $cvv) &&
+      preg_match('/^[a-zA-Z\s]+$/', $name)
+    ) {
+      header("Location: ../user_landing_page/index.php");
+      exit();
+    } else {
+      echo "<script>alert('Invalid Card details');</script>";
+    }
+  }
+}
+
+// Session values
 $email = $_SESSION['email'] ?? 'Not set';
 $first_name = $_SESSION['first_name'] ?? '';
 $last_name = $_SESSION['last_name'] ?? '';
@@ -9,10 +41,21 @@ $contact = $_SESSION['contact'] ?? '';
 $check_in = $_SESSION['check_in'] ?? '';
 $check_out = $_SESSION['check_out'] ?? '';
 $room_type = $_SESSION['room_type'] ?? 'Standard Room';
-
+$room_price = $_SESSION['room_price'] ?? 1200;
+$total_price = $_SESSION['total_price'] ?? $room_price;
 $full_name = trim($first_name . ' ' . $last_name);
-?>
+$hotel_name = $_SESSION['hotel_name'] ?? 'Crown Hotel at Legaspi';
 
+$locations = [
+  'Crown Hotel at Legaspi' => 'Pasay City, Metro Manila',
+  'Crown Hotel at Westside City Tambo' => 'Parañaque, Metro Manila',
+  'Crown Hotel at General Espino' => 'Taguig, Metro Manila',
+  'Crown Hotel at San Roque' => 'San Roque, Antipolo',
+  'Crown Hotel at Tatlong Hari' => 'Tatlong Hari, Laguna'
+];
+
+$location = $locations[$hotel_name] ?? 'Unknown Location';
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -25,6 +68,7 @@ $full_name = trim($first_name . ' ' . $last_name);
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+  <!-- HEADER -->
   <header class="topbar">
     <div class="logo">
       <img src="../assets/img/LOGO.png" alt="Crown Tower Logo">
@@ -36,52 +80,92 @@ $full_name = trim($first_name . ' ' . $last_name);
     </nav>
   </header>
 
+  <!-- PAYMENT SECTION -->
   <div class="payment">
     <div class="left-panel">
       <div class="payment-method-container">
         <h3>Payment Method</h3>
-        <h5 class="cancellation-policy">Cancellations are subject to a penalty: 20% of the room rate if cancelled within 2 days of check-in, 15% if cancelled 4 days prior, and 10% if cancelled 5 days or more in advance (based on 24-hour format).</h5>
+        <h5 class="cancellation-policy">Cancellations are subject to a penalty...</h5>
 
         <p class="method-label">E-Wallet / E-Money</p>
         <div class="payment-buttons">
-          <button class="gcash">Gcash</button>
-          <button class="paymaya">Paymaya</button>
-          <button class="gotyme">GoTyme</button>
+          <button class="gcash" onclick="selectPayment('ewallet')">Gcash</button>
+          <button class="paymaya" onclick="selectPayment('ewallet')">Paymaya</button>
+          <button class="gotyme" onclick="selectPayment('ewallet')">GoTyme</button>
         </div>
 
         <p class="method-label">Credit / Debit Card</p>
         <div class="payment-buttons">
-          <button class="bdo">BDO</button>
-          <button class="bpi">BPI</button>
-          <button class="metrobank">Metrobank</button>
+          <button class="bdo" onclick="selectPayment('card')">BDO</button>
+          <button class="bpi" onclick="selectPayment('card')">BPI</button>
+          <button class="metrobank" onclick="selectPayment('card')">Metrobank</button>
         </div>
       </div>
     </div>
 
-<div class="right-panel">
-  <div class="booking-box">
-    <h3>Crown Hotel at Legaspi</h3>
-    <p class="location">Pasay City, Metro Manila</p>
-    
-<div class="info-box">Transaction ID: <?= htmlspecialchars($_SESSION['transaction_id'] ?? 'Unavailable') ?></div>
-<div class="info-box">Name: <?= htmlspecialchars($full_name) ?></div>
-<div class="info-box">Email: <?= htmlspecialchars($email) ?></div>
-<div class="info-box">Contact: <?= htmlspecialchars($contact) ?></div>
-<div class="info-box">Check-in: <?= htmlspecialchars($check_in) ?></div>
-<div class="info-box">Check-out: <?= htmlspecialchars($check_out) ?></div>
-<div class="info-box">Room Type: <?= htmlspecialchars($room_type) ?></div>
-
-
-    <div class="total-section">
-      <p class="total-label">Total Payment<br><span>Included Tax</span></p>
-      <p class="price">₱1,200</p> <!-- Optional: Make this dynamic -->
+    <div class="right-panel">
+      <div class="booking-box">
+        <h3><?= htmlspecialchars($hotel_name) ?></h3>
+        <p class="location"><?= htmlspecialchars($location) ?></p>
+        <div class="info-box">Transaction ID: <?= htmlspecialchars($_SESSION['transaction_id'] ?? 'Unavailable') ?></div>
+        <div class="info-box">Name: <?= htmlspecialchars($full_name) ?></div>
+        <div class="info-box">Email: <?= htmlspecialchars($email) ?></div>
+        <div class="info-box">Contact: <?= htmlspecialchars($contact) ?></div>
+        <div class="info-box">Check-in: <?= htmlspecialchars($check_in) ?></div>
+        <div class="info-box">Check-out: <?= htmlspecialchars($check_out) ?></div>
+        <div class="info-box">Room Type: <?= htmlspecialchars($room_type) ?></div>
+        <div class="total-section">
+          <p class="total-label">Total Payment<br><span>Included</span></p>
+          <p class="price">₱<?= number_format($total_price, 2) ?></p>
+        </div>
+        <button class="pay-button" onclick="finalizePayment()">Pay Now</button>
+      </div>
     </div>
-    
-    <button class="pay-button" id="open-popup">Pay Now</button>
   </div>
-</div>
 
+  <!-- POPUPS -->
+  <div id="payment-popup" class="popup-overlay">
+    <div class="popup-content">
+      <span class="close-btn" onclick="closePopup('payment-popup')">&times;</span>
+      <h2>AMOUNT TO BE PAID</h2>
+      <p class="payment-note">Total Payment<br><strong>₱<?= number_format($total_price, 2) ?></strong></p>
+      <input type="text" id="ewallet_number" placeholder="11-digit number" maxlength="11" />
+      <input type="text" id="ewallet_name" placeholder="Full Name (letters only)" />
+      <p class="secure-msg">Your payment is 100% secure. All processes are encrypted.</p>
+    </div>
+  </div>
 
+  <div id="card-popup" class="popup-overlay">
+    <div class="popup-content">
+      <span class="close-btn" onclick="closePopup('card-popup')">&times;</span>
+      <h2>AMOUNT TO BE PAID</h2>
+      <p class="payment-note">Total Payment<br><strong>₱<?= number_format($total_price, 2) ?></strong></p>
+      <input type="text" id="card_number" placeholder="16-digit card number" maxlength="16" />
+      <div style="display: flex; gap: 10px;">
+        <input type="text" id="expiry" placeholder="MM/YY" maxlength="5" />
+        <input type="text" id="cvv" placeholder="CVV" maxlength="3" />
+      </div>
+      <input type="text" id="card_name" placeholder="Full Name (letters only)" />
+      <p class="secure-msg">Your payment is 100% secure. All processes are encrypted.</p>
+    </div>
+  </div>
+
+  <!-- HIDDEN FORMS -->
+  <form id="ewallet-form" method="POST" style="display:none;">
+    <input type="hidden" name="ewallet_submit" value="1" />
+    <input type="hidden" name="ewallet_number" id="hidden_ewallet_number" />
+    <input type="hidden" name="ewallet_name" id="hidden_ewallet_name" />
+  </form>
+
+  <form id="card-form" method="POST" style="display:none;">
+    <input type="hidden" name="card_submit" value="1" />
+    <input type="hidden" name="card_number" id="hidden_card_number" />
+    <input type="hidden" name="expiry" id="hidden_expiry" />
+    <input type="hidden" name="cvv" id="hidden_cvv" />
+    <input type="hidden" name="card_name" id="hidden_card_name" />
+  </form>
+
+  <!-- FOOTER -->
   <footer class="footer">
     <div class="footer-content">
       <div class="footer-left">
@@ -109,43 +193,50 @@ $full_name = trim($first_name . ' ' . $last_name);
     </div>
   </footer>
 
-  <!-- POPUP PAYMENT FORM -->
-  <div id="payment-popup" class="popup-overlay">
-    <div class="popup-content">
-      <span id="close-popup" class="close-btn">&times;</span>
-      <h2>AMOUNT TO BE PAID</h2>
-      <p class="payment-note">Total Payment<br><strong>₱1,200</strong></p>
-      <input type="text" placeholder="Number">
-      <input type="text" placeholder="Full Name">
-      <p class="secure-msg">Your payment is 100% secure. All processes are encrypted.</p>
-      <button class="confirm-btn">CONFIRM PAYMENT</button>
-    </div>
-  </div>
+  <!-- JS -->
+  <script>
+    let selectedPayment = "";
 
-<!-- CARD POPUP FOR BANK PAYMENTS -->
-<div class="popup-overlay" id="card-popup">
-  <div class="popup-content">
-    <span class="close-btn" id="close-card-popup">&times;</span>
-    <h2>AMOUNT TO BE PAID</h2>
-    <p class="payment-note">Total Payment<br><strong>₱ 1,200</strong></p>
+    function selectPayment(type) {
+      selectedPayment = type;
+      openPopup(type === 'ewallet' ? 'payment-popup' : 'card-popup');
+    }
 
-    <input type="text" placeholder="Card Number" maxlength="19" />
-    <div style="display: flex; gap: 10px;">
-      <input type="text" placeholder="Expiry MM/YY" maxlength="5" />
-      <input type="text" placeholder="CVV" maxlength="3" />
-    </div>
-    <input type="text" placeholder="Full Name" />
+    function openPopup(id) {
+      document.getElementById(id).classList.add("active");
+    }
 
-    <p class="secure-msg">
-      Your payment is 100% secure. All process will be conducted through encrypted network.
-      Please call our customer service if there's problem.
-    </p>
+    function closePopup(id) {
+      document.getElementById(id).classList.remove("active");
+    }
 
-    <button class="confirm-btn">CONFIRM PAYMENT</button>
-  </div>
-</div>
-
-
-  <script src="payment.js"></script>
+    function finalizePayment() {
+      if (selectedPayment === "ewallet") {
+        const number = document.getElementById("ewallet_number").value.trim();
+        const name = document.getElementById("ewallet_name").value.trim();
+        if (!/^\d{11}$/.test(number)) return alert("E-Wallet number must be exactly 11 digits.");
+        if (!/^[a-zA-Z\s]+$/.test(name)) return alert("Full name must contain letters only.");
+        document.getElementById("hidden_ewallet_number").value = number;
+        document.getElementById("hidden_ewallet_name").value = name;
+        document.getElementById("ewallet-form").submit();
+      } else if (selectedPayment === "card") {
+        const number = document.getElementById("card_number").value.trim();
+        const expiry = document.getElementById("expiry").value.trim();
+        const cvv = document.getElementById("cvv").value.trim();
+        const name = document.getElementById("card_name").value.trim();
+        if (!/^\d{16}$/.test(number)) return alert("Card number must be exactly 16 digits.");
+        if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiry)) return alert("Expiry must be in MM/YY format.");
+        if (!/^\d{3}$/.test(cvv)) return alert("CVV must be 3 digits.");
+        if (!/^[a-zA-Z\s]+$/.test(name)) return alert("Full name must contain letters only.");
+        document.getElementById("hidden_card_number").value = number;
+        document.getElementById("hidden_expiry").value = expiry;
+        document.getElementById("hidden_cvv").value = cvv;
+        document.getElementById("hidden_card_name").value = name;
+        document.getElementById("card-form").submit();
+      } else {
+        alert("Please select a payment method first.");
+      }
+    }
+  </script>
 </body>
 </html>

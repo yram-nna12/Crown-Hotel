@@ -1,5 +1,8 @@
 <?php
 // booknow.php
+$hotel_name = $_GET['hotel'] ?? 'Crown Hotel';
+$room_type = $_GET['room'] ?? 'Standard Room';
+$room_price = $_GET['price'] ?? 1200;
 ?>
 
 <!DOCTYPE html>
@@ -20,7 +23,7 @@
     <nav class="nav-links">
       <a href="" class="btn booking" style="color:  #0a2240; background-color: #ffffff; font-weight: 600;">Booking</a>
       <a href="../user_landing_page/index.php" style="color:  #d9a441; font-weight: 600;" class="btn home">Home</a>
-      <a href="../"style="color:  #d9a441; font-weight: 600;" class="btn home" class="btn home">Account</a>
+      <a href="../" style="color:  #d9a441; font-weight: 600;" class="btn home">Account</a>
     </nav>
   </header>
 
@@ -31,7 +34,6 @@
         Cancellations are subject to a penalty: 20% of the room rate if cancelled within 2 days of check-in, 15% if cancelled 4 days prior, and 10% if cancelled 5 days or more in advance (based on 24-hour format).
       </p>
 
-      <!-- ✅ Form submission goes to process_booking.php -->
       <form method="POST" action="./process_booking.php">
         <label>Email</label>
         <input type="email" name="email" placeholder="Enter your email" required>
@@ -61,7 +63,10 @@
           </div>
         </div>
 
-        <input type="hidden" name="room_type" value="Standard Room">
+        <!-- ✅ Hidden inputs for dynamic data -->
+        <input type="hidden" name="hotel_name" value="<?= htmlspecialchars($hotel_name) ?>">
+        <input type="hidden" name="room_type" value="<?= htmlspecialchars($room_type) ?>">
+        <input type="hidden" name="room_price" value="<?= htmlspecialchars($room_price) ?>">
 
         <button type="submit" class="btn submit">Proceed</button>
       </form>

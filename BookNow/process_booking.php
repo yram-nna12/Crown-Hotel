@@ -2,6 +2,21 @@
 session_start();
 require_once '../config.php'; // your DB connection
 
+// ✅ Validate reservation at least 2 full days in advance
+date_default_timezone_set('Asia/Manila');
+
+if (isset($_POST['check_in'])) {
+    $checkIn = $_POST['check_in'];
+    $checkInTime = strtotime($checkIn . ' 00:00:00');
+    $now = time();
+    $minAdvance = 60 * 60 * 24 * 2; // 2 full days in seconds
+
+    if (($checkInTime - $now) < $minAdvance) {
+        echo "<script>alert('Reservation must be made at least 2 full days in advance (24-hour format).'); window.history.back();</script>";
+        exit;
+    }
+}
+
 // Capture form data
 $first_name = $_POST['first_name'];
 $last_name = $_POST['last_name'];
@@ -11,6 +26,29 @@ $check_in = $_POST['check_in'];
 $check_out = $_POST['check_out'];
 $room_type = $_POST['room_type'];
 $reservation_date = date('Y-m-d'); // current date
+
+// ✅ Capture hotel_name and room_price if passed from booknow.php
+$hotel_name = $_POST['hotel_name'] ?? 'Crown Hotel';
+$room_price = $_POST['room_price'] ?? 1200;
+
+// ✅ Calculate number of nights and total price
+$check_in_date = new DateTime($check_in);
+$check_out_date = new DateTime($check_out);
+$nights = $check_out_date->diff($check_in_date)->days;
+$total_price = $room_price * $nights;
+
+// ✅ Get hotel location based on name
+function getHotelLocation($name) {
+    $hotels = [
+        "Crown Hotel at Legaspi" => "Pasay City, Metro Manila",
+        "Crown Hotel at Westside City Tambo" => "Parañaque, Metro Manila",
+        "Crown Hotel at General Espino" => "Taguig, Metro Manila",
+        "Crown Hotel at San Roque" => "San Roque, Antipolo",
+        "Crown Hotel at Tatlong Hari" => "Tatlong Hari, Laguna"
+    ];
+    return $hotels[$name] ?? 'Unknown Location';
+}
+$hotel_location = getHotelLocation($hotel_name);
 
 // Generate Transaction ID
 $initials = strtoupper(substr($first_name, 0, 2));
@@ -40,7 +78,7 @@ $stmt->bind_param("sssssssss", $transaction_id, $first_name, $last_name, $email,
 $stmt->execute();
 $stmt->close();
 
-// Save to session
+// ✅ Save booking details to session
 $_SESSION['transaction_id'] = $transaction_id;
 $_SESSION['first_name'] = $first_name;
 $_SESSION['last_name'] = $last_name;
@@ -49,8 +87,21 @@ $_SESSION['contact'] = $contact;
 $_SESSION['check_in'] = $check_in;
 $_SESSION['check_out'] = $check_out;
 $_SESSION['room_type'] = $room_type;
+$_SESSION['hotel_name'] = $hotel_name;
+$_SESSION['hotel_location'] = $hotel_location;
+$_SESSION['nights'] = $nights;
 
-// Redirect
+// ✅ Room price & total
+$room_prices = [
+    "Standard Room" => 1200,
+    "Deluxe Room" => 1350,
+    "Superior Room" => 1500,
+    "Suite Room" => 1600
+];
+$room_price = $room_prices[$room_type] ?? $room_price;
+$_SESSION['room_price'] = $room_price;
+$_SESSION['total_price'] = $total_price;
+
+// Redirect to payment
 header("Location: ../payment/payment.php");
 exit();
-?>

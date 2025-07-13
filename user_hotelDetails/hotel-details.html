@@ -10,13 +10,13 @@
 </head>
 
 <body>
-   <header class="topbar">
+  <header class="topbar">
     <div class="logo">
       <img src="../assets/img/LOGO.png" alt="Crown Tower Logo">
     </div>
     <nav class="nav-links">
-      <a href="" class="btn booking" style="color:  #0a2240; background-color: #ffffff; font-weight: 600;">Booking</a>
-      <a href="../user_landing_page/index.php" style="color:  #d9a441; font-weight: 600;" class="btn home">Home</a>
+      <a href="" class="btn booking" style="color: #0a2240; background-color: #ffffff; font-weight: 600;">Booking</a>
+      <a href="../user_landing_page/index.php" style="color: #d9a441; font-weight: 600;" class="btn home">Home</a>
       <a href="../AccountDetails/account.php" class="btn home">Account</a>
     </nav>
   </header>
@@ -154,7 +154,7 @@
             <p>Start at</p>
             <h2>₱${room.price}</h2>
             <small>Included Tax</small>
-            <a href="../BookNow/booknow.php?hotel=Crown%20Hotel%20at%20Legaspi&room=Standard%20Room&guests=2&checkin=2025-07-12&checkout=2025-07-14&price=1200" class="btn book-now">Book Now</a>
+            <a href="../BookNow/booknow.php?hotel=${encodeURIComponent(hotel.name)}&room=${encodeURIComponent(room.name)}&price=${room.price}" class="btn book-now">Book Now</a>
           </div>`;
         roomSection.appendChild(div);
       });
